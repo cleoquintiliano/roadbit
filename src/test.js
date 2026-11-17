@@ -1,26 +1,47 @@
+// Testes automáticos da trilha: toda missão precisa ser resolvível e coerente.
 const E = require('./engine.js');
-let ok = true;
-const allNums = ast => { const r = []; const w = o => { if (!o || typeof o !== 'object') return; if (o.k === 'num') r.push(o); Object.values(o).forEach(v => Array.isArray(v) ? v.forEach(w) : (v && typeof v === 'object' && w(v))); }; ast.forEach(w); return r; };
-for (const m0 of E.MISSIONS) {
-  for (const mir of [false, true]) {
-    const m = mir ? E.mirrorMission(m0) : E.clone(m0);
-    const ast = E.clone(m.code); const lay = E.layout(ast);
-    const r = E.simulate(m, ast);
-    const ins = r.steps.filter(s => s.kind === 'in').map(s => s.key).join('');
-    let msg = '';
-    if (m.modo === 'rastrear') {
-      if (!r.allLit || r.fail || r.overflow) { ok = false; msg = 'FALHA rastrear'; }
-    } else if (m.modo === 'prever') {
-      if (r.overflow) { ok = false; msg = 'FALHA overflow'; }
-      msg += ' final=' + r.final.x + ',' + r.final.y + (m.predictVar ? ' ' + m.predictVar + '=' + r.final.vars[m.predictVar] : '');
-    } else if (m.modo === 'depurar') {
-      if (r.allLit && !r.fail) { ok = false; msg = 'FALHA: bug não falha'; }
-      const fixes = [];
-      allNums(ast).forEach(nd => { const orig = nd.v; for (let v = 0; v <= 9; v++) { if (v === orig) continue; nd.v = v; const t = E.simulate(m, ast); if (t.allLit && !t.fail && !t.overflow) fixes.push(nd.id + ':' + orig + '->' + v); } nd.v = orig; });
-      if (!fixes.length) { ok = false; msg = 'FALHA sem correção'; }
-      msg += ' correções=' + fixes.join(' ');
-    }
-    console.log((mir ? 'esp ' : '    ') + m.id, m.modo.padEnd(9), 'linhas=' + lay.lines.length, 'passos=' + r.steps.length, 'teclas=' + ins, msg);
+const { MARCOS, MISSIONS } = require('./missoes.js');
+let erros = 0;
+const falha = (m, msg) => { erros++; console.log('FALHA ' + m.id + ' (' + m.modo + ') ' + m.titulo + ': ' + msg); };
+const roda = (m, code) => { const c = E.clone(code); const L = E.layout(c); return { t: E.simulate(m, c), L }; };
+
+MARCOS.forEach(k => {
+  const ms = MISSIONS.filter(m => m.marco === k.id);
+  if (ms.length !== 12) { erros++; console.log('Marco ' + k.id + ' tem ' + ms.length + ' missões'); }
+  const conta = {}; ms.forEach(m => conta[m.modo] = (conta[m.modo] || 0) + 1);
+  if (conta.rastrear !== 7 || conta.prever !== 2 || conta.depurar !== 2 || conta.explicar !== 1) { erros++; console.log('Marco ' + k.id + ' composição', JSON.stringify(conta)); }
+});
+
+MISSIONS.forEach(m0 => [m0, E.mirrorMission(m0)].forEach((m, esp) => {
+  const tag = esp ? ' [espelhada]' : '';
+  const { t, L } = roda(m, m.code);
+  if (t.overflow && m.modo !== 'depurar') return falha(m, 'estouro' + tag);
+  if (L.lines.length > 16) falha(m, 'código com ' + L.lines.length + ' linhas (máximo 16)');
+  const w = m.map[0].length, h = m.map.length;
+  if (w > 10 || h > 5) falha(m, 'mapa grande ' + w + 'x' + h);
+  if (m.modo === 'rastrear') {
+    if (t.fail) falha(m, 'falha ' + t.fail + tag);
+    if (!t.allLit || !t.houses.length) falha(m, 'não acende todas as casas' + tag);
+    if (!t.steps.some(s => s.kind === 'in')) falha(m, 'sem passos do estudante');
+    if (t.steps.length > 90) falha(m, 'rastro longo: ' + t.steps.length);
   }
-}
-console.log(ok ? 'TUDO OK' : 'HÁ FALHAS');
+  if (m.modo === 'prever' || m.modo === 'explicar') {
+    if (t.fail) falha(m, 'falha ' + t.fail + tag);
+    if (m.predictVar && typeof t.final.vars[m.predictVar] !== 'number') falha(m, 'variável prevista não numérica');
+    if (m.modo === 'prever' && !m.predictVar && t.final.x === m.start[0] && t.final.y === m.start[1]) falha(m, 'termina onde começou' + tag);
+    if (m.modo === 'explicar' && (!m.opcoes || m.opcoes.length !== 3)) falha(m, 'precisa de 3 opções');
+  }
+  if (m.modo === 'depurar') {
+    if (!t.fail && t.allLit && !t.overflow) falha(m, 'o código com erro já funciona' + tag);
+    const c = roda(m, m.certo).t;
+    if (c.fail || !c.allLit || c.overflow) falha(m, 'a correção não funciona' + tag);
+    // deve existir exatamente o conserto esperado ao alcance: um número ou uma direção
+    const a = E.coletar(m.code), b = E.coletar(m.certo);
+    const dif = a.nums.filter((n, i) => n.v !== b.nums[i].v).length + a.moves.filter((n, i) => n.d !== b.moves[i].d).length;
+    if (dif !== 1) falha(m, 'diferença entre erro e correção = ' + dif);
+    const nd = a.nums.find((n, i) => n.v !== b.nums[i].v);
+    if (nd && (b.nums[a.nums.indexOf(nd)].v > 9)) falha(m, 'correção fora de 0..9');
+  }
+}));
+console.log(MISSIONS.length + ' missões em ' + MARCOS.length + ' marcos. ' + (erros ? erros + ' falha(s).' : 'Tudo certo.'));
+process.exit(erros ? 1 : 0);
