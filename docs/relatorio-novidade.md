@@ -1,10 +1,12 @@
-# O Mensageiro: relatório de novidade e diferenciação
+# RoadBit: relatório de novidade e diferenciação
 
-2026-11-05 · Cléo Quintiliano Fernandes de Brito
+2026-11-05, nomes atualizados em 2026-11-17 · Cléo Quintiliano Fernandes de Brito
+
+> Relatório escrito quando o jogo se chamava O Mensageiro (v0.1). A busca e a análise são de 05/11/2026; nesta revisão, só o nome foi atualizado. O que a v0.2 acrescenta (trilha completa, modo Explicar e visualização da execução) está na [trilha de aprendizagem](trilha-de-aprendizagem.md) e no [esboço 5W2H](esboco-5W2H.md#roadbit-e-as-ferramentas-do-mesmo-escopo).
 
 ## Resposta curta
 
-Nenhuma peça isolada do Mensageiro é inédita. Colocar o estudante no papel do computador já existe (Compute It, UUhistle), ensinar a ler código antes de escrever também (PLTutor, Reduct, PRIMM), jogo de depuração com robô e narrativa idem (Gidget), e o teste de mesa com correção automática tem até ferramenta brasileira recente (My Trace Table, EduComp 2026).
+Nenhuma peça isolada do RoadBit é inédita. Colocar o estudante no papel do computador já existe (Compute It, UUhistle), ensinar a ler código antes de escrever também (PLTutor, Reduct, PRIMM), jogo de depuração com robô e narrativa idem (Gidget), e o teste de mesa com correção automática tem até ferramenta brasileira recente (My Trace Table, EduComp 2026).
 
 O que não encontramos em nenhuma aplicação ou artigo foi a **combinação**: um único jogo que encadeia **rastrear, prever, depurar e teste de mesa** sobre o mesmo programa, com **erro em camadas**, em **pseudocódigo em português com condições por forma e cor**, preparado para **blocos, Python e JS a partir de uma única árvore sintática**, alinhado à **BNCC Computação dos anos finais**, com **progresso pseudônimo compatível com a LGPD** e **narrativa de valores implícitos**. A alegação defensável para o mestrado é, portanto, de **novidade de combinação e de contexto**, não de invenção do conceito.
 
@@ -18,7 +20,7 @@ O que não encontramos em nenhuma aplicação ou artigo foi a **combinação**: 
 
 ## Aplicações e pesquisas mais próximas
 
-| Aplicação / pesquisa | O que faz | Público | O que falta em relação ao Mensageiro |
+| Aplicação / pesquisa | O que faz | Público | O que falta em relação ao RoadBit |
 | --- | --- | --- | --- |
 | Compute It (Toxicode) | O estudante é o computador: lê o programa e move o robô com as setas. Popular na Hora do Código e na CodeWeek | Anos iniciais e finais | Sem prever, sem depurar, sem teste de mesa, sem variáveis explícitas, progresso só no navegador, só em inglês e pseudo-JS |
 | UUhistle (Sorva; Sirkiä, 2010) | Simulação visual de programa: o estudante executa Python manipulando a memória | Ensino superior (CS1) | Não é jogo narrativo, não é para a escola básica, foco em memória e não em fluxo |
@@ -26,20 +28,20 @@ O que não encontramos em nenhuma aplicação ou artigo foi a **combinação**: 
 | PLTutor (Nelson; Xie; Ko, 2017) | Tutor de compreensão primeiro: ensina a semântica antes de escrever código | Superior | Não é jogo, sem narrativa, sem depuração como desafio |
 | Gidget (Lee et al., 2014) | Jogo de depuração primeiro: robô com código errado, narrativa de salvar animais | Adolescentes e adultos | Linguagem própria em inglês, sem rastreio passo a passo, sem prever, sem teste de mesa |
 | Reduct (Arawjo et al., 2017) | Quebra-cabeça que gamifica a avaliação de expressões | Iniciantes | Foco em expressões, não em programas com laços e variáveis |
-| PRIMM (Sentance; Waite; Kallia, 2019) | Sequência didática Prever, Executar, Investigar, Modificar, Criar | 11 a 14 anos | É método de aula, não aplicação; o Mensageiro operacionaliza parte dele em jogo |
+| PRIMM (Sentance; Waite; Kallia, 2019) | Sequência didática Prever, Executar, Investigar, Modificar, Criar | 11 a 14 anos | É método de aula, não aplicação; o RoadBit operacionaliza parte dele em jogo |
 | King's Scroll (Malaise; Signer) | Jogo de predição para a etapa Prever do PRIMM | Escola | Só prever; sem depurar e sem simulação passo a passo (dados completos a conferir) |
 | Feedback Buddy (DELFI 2024) | Tutor de rastreio com tabela de rastreio e feedback de mentalidade de crescimento | Escola | Não é jogo, sem narrativa e sem depuração |
 | My Trace Table (Souza; Silva; Rebouças, 2026) | Teste de mesa com correção automática por cores (acerto, erro de valor, erro de tipo) | Introdução à programação | Não é jogo, foco no ensino superior e técnico |
 | Lightbot (Gouws; Bradshaw; Wentworth, 2013) | Monta sequências de símbolos para o robô acender luzes | Crianças | O estudante **escreve**, não lê nem depura código |
 | Blockly Games, CodeCombat, Code.org | Programação por blocos ou texto em fases | Variado | Foco em escrever; leitura e rastreio são secundários |
-| Pencil Code (Bau et al., 2015) | Alterna entre blocos e texto no mesmo programa | Escola e superior | É editor, não jogo de leitura; inspira a AST única do Mensageiro |
+| Pencil Code (Bau et al., 2015) | Alterna entre blocos e texto no mesmo programa | Escola e superior | É editor, não jogo de leitura; inspira a AST única do RoadBit |
 | Iniciativas brasileiras (SBGames, WEI, RENOTE) | Jogos de lógica (Codando Aventuras, Exploradores do Código, Poké Prog, Farm Code, Codebricks), Grafotopia e relato de depuração no Scratch no 4º ano | Escola básica | Predominam escrever e montar; depuração aparece como atividade, não como mecânica central (a conferir texto a texto) |
 
 ## Matriz de características
 
 Legenda: ✓ tem; ◐ tem em parte; ✗ não tem.
 
-| Característica | Mensageiro | Compute It | UUhistle | Python Tutor | Gidget | PRIMM / King's Scroll | My Trace Table | Lightbot |
+| Característica | RoadBit | Compute It | UUhistle | Python Tutor | Gidget | PRIMM / King's Scroll | My Trace Table | Lightbot |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Estudante simula a execução | ✓ | ✓ | ✓ | ✗ | ◐ | ✗ | ◐ | ✗ |
 | Prever o resultado antes | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -89,7 +91,7 @@ Citar essas bases fortalece o projeto: mostra que cada escolha tem apoio na lite
 - **Busca não sistemática.** Pode existir jogo em anais menores ou em outro idioma com combinação parecida. Sem mapeamento formal, a banca pode contestar a palavra "inédito".
 - **Recursos ainda não implementados.** Blocos, Python e JS estão previstos, não prontos. Contam como arquitetura, não como resultado.
 - **Sem evidência de aprendizagem.** Novidade de desenho não é eficácia. O teste de jogo atual mede usabilidade, não ganho.
-- **Dependência do Compute It.** A inspiração é declarada e deve continuar assim; a avaliação precisa mostrar o que o Mensageiro acrescenta.
+- **Dependência do Compute It.** A inspiração é declarada e deve continuar assim; a avaliação precisa mostrar o que o RoadBit acrescenta.
 - **Casa visível como atalho.** Conforme a análise anterior, nas missões de rastrear a casa pode virar pista do destino e enfraquecer a leitura do código.
 
 **Recomendações para o mestrado**
