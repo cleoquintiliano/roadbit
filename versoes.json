@@ -1,0 +1,35 @@
+{
+  "projeto": "RoadBit",
+  "atual": "0.2",
+  "versoes": [
+    {
+      "versao": "0.2",
+      "tag": "v0.2.0",
+      "data": "2026-11-17",
+      "nome": "RoadBit",
+      "resumo": "Trilha completa: 16 marcos num mapa único, 192 missões, modo Explicar, cartões de conceito e visualização da execução.",
+      "jogo": "versoes/v0.2/jogo/",
+      "apresentacao": null,
+      "docs": [
+        { "titulo": "Trilha de aprendizagem", "url": "versoes/v0.2/docs/trilha-de-aprendizagem.html" },
+        { "titulo": "Game Design Document", "url": "versoes/v0.2/docs/GDD.html" },
+        { "titulo": "Esboço da atividade (5W2H)", "url": "versoes/v0.2/docs/esboco-5W2H.html" },
+        { "titulo": "Relatório de novidade", "url": "versoes/v0.2/docs/relatorio-novidade.html" }
+      ]
+    },
+    {
+      "versao": "0.1",
+      "tag": "v0.1.0",
+      "data": "2026-11-06",
+      "nome": "O Mensageiro",
+      "resumo": "Demonstração: 4 bairros, 19 missões nos modos Rastrear, Prever e Depurar.",
+      "jogo": "versoes/v0.1/jogo/",
+      "apresentacao": "versoes/v0.1/apresentacao/",
+      "docs": [
+        { "titulo": "Game Design Document", "url": "versoes/v0.1/docs/GDD.html" },
+        { "titulo": "Esboço da atividade (5W2H)", "url": "versoes/v0.1/docs/esboco-5W2H.html" },
+        { "titulo": "Relatório de novidade", "url": "versoes/v0.1/docs/relatorio-novidade.html" }
+      ]
+    }
+  ]
+}
