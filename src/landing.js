@@ -15,7 +15,7 @@ const linhas = V.versoes.map(v => `
         <nav>
           <a href="${v.jogo}">Jogo</a>${v.apresentacao ? `\n          <a href="${v.apresentacao}">Apresentação</a>` : ''}
           ${v.docs.map(d => `<a href="${d.url}">${esc(d.titulo)}</a>`).join('\n          ')}
-          <a href="https://github.com/cleoquintiliano/roadbit/releases/tag/${v.tag}">Código (${v.tag})</a>
+          <a href="https://github.com/cleoquintiliano/roadbit/tree/${v.commit}">Código (${v.tag})</a>
         </nav>
       </article>`).join('');
 const html = `<!DOCTYPE html>

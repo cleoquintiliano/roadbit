@@ -11,11 +11,24 @@
       "jogo": "versoes/v0.2/jogo/",
       "apresentacao": null,
       "docs": [
-        { "titulo": "Trilha de aprendizagem", "url": "versoes/v0.2/docs/trilha-de-aprendizagem.html" },
-        { "titulo": "Game Design Document", "url": "versoes/v0.2/docs/GDD.html" },
-        { "titulo": "Esboço da atividade (5W2H)", "url": "versoes/v0.2/docs/esboco-5W2H.html" },
-        { "titulo": "Relatório de novidade", "url": "versoes/v0.2/docs/relatorio-novidade.html" }
-      ]
+        {
+          "titulo": "Trilha de aprendizagem",
+          "url": "versoes/v0.2/docs/trilha-de-aprendizagem.html"
+        },
+        {
+          "titulo": "Game Design Document",
+          "url": "versoes/v0.2/docs/GDD.html"
+        },
+        {
+          "titulo": "Esboço da atividade (5W2H)",
+          "url": "versoes/v0.2/docs/esboco-5W2H.html"
+        },
+        {
+          "titulo": "Relatório de novidade",
+          "url": "versoes/v0.2/docs/relatorio-novidade.html"
+        }
+      ],
+      "commit": "c6441c2"
     },
     {
       "versao": "0.1",
@@ -26,10 +39,20 @@
       "jogo": "versoes/v0.1/jogo/",
       "apresentacao": "versoes/v0.1/apresentacao/",
       "docs": [
-        { "titulo": "Game Design Document", "url": "versoes/v0.1/docs/GDD.html" },
-        { "titulo": "Esboço da atividade (5W2H)", "url": "versoes/v0.1/docs/esboco-5W2H.html" },
-        { "titulo": "Relatório de novidade", "url": "versoes/v0.1/docs/relatorio-novidade.html" }
-      ]
+        {
+          "titulo": "Game Design Document",
+          "url": "versoes/v0.1/docs/GDD.html"
+        },
+        {
+          "titulo": "Esboço da atividade (5W2H)",
+          "url": "versoes/v0.1/docs/esboco-5W2H.html"
+        },
+        {
+          "titulo": "Relatório de novidade",
+          "url": "versoes/v0.1/docs/relatorio-novidade.html"
+        }
+      ],
+      "commit": "2156723"
     }
   ]
 }
