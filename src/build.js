@@ -1,16 +1,17 @@
-// Gera jogo/index.html juntando a interface (app.html) e o motor (engine.js).
-// Uso: node src/build.js
-const fs = require('fs');
-const path = require('path');
-
-const app = fs.readFileSync(path.join(__dirname, 'app.html'), 'utf8');
-const engine = fs.readFileSync(path.join(__dirname, 'engine.js'), 'utf8');
-
-if (!app.includes('/*ENGINE*/')) {
-  console.error('Marcador /*ENGINE*/ não encontrado em app.html');
-  process.exit(1);
+// Junta interface, motor, missões, fontes e ilustração num único arquivo HTML que funciona sem internet.
+// Uso: node src/build.js  (gera versoes/v0.2/jogo/index.html e copia para jogo/index.html)
+const fs = require('fs'), path = require('path');
+const ler = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
+const iife = code => '(function(){\n' + code + '\n})();';
+let html = ler('app.html');
+const troca = (marca, txt) => { if (!html.includes(marca)) throw new Error('marca ausente: ' + marca); html = html.split(marca).join(txt); };
+troca('/*FONTS*/', ler('fonts.css'));
+troca('<!--SKYLINE-->', ler('skyline.html'));
+troca('/*ENGINE*/', iife(ler('engine.js')));
+troca('/*MISSOES*/', iife(ler('missoes.js')));
+const raiz = path.join(__dirname, '..');
+for (const destino of ['versoes/v0.2/jogo', 'jogo']) {
+  fs.mkdirSync(path.join(raiz, destino), { recursive: true });
+  fs.writeFileSync(path.join(raiz, destino, 'index.html'), html);
 }
-
-const out = path.join(__dirname, '..', 'jogo', 'index.html');
-fs.writeFileSync(out, app.replace('/*ENGINE*/', () => engine));
-console.log('Gerado:', out);
+console.log('Gerado: ' + (html.length / 1024).toFixed(0) + ' KB em versoes/v0.2/jogo/ e jogo/');
