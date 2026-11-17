@@ -1,90 +1,205 @@
-// ===== Motor do Mensageiro: AST, interpretador e tradutor para pseudocódigo =====
+// ===== RoadBit: motor (árvore sintática, tradutor para pseudocódigo e interpretador) =====
+// Cada missão guarda o programa como uma árvore. O interpretador percorre a árvore e
+// devolve o rastro completo da execução, passo a passo. A interface só reproduz o rastro.
+
 const DIRS = { R: [1, 0], L: [-1, 0], U: [0, -1], D: [0, 1] };
 const MOVE_WORD = { R: 'direita()', L: 'esquerda()', U: 'cima()', D: 'baixo()' };
 const MOVE_NOME = { R: 'para a direita', L: 'para a esquerda', U: 'para cima', D: 'para baixo' };
 const SETA = { R: '→', L: '←', U: '↑', D: '↓', E: 'Entregar' };
+const DIR_DA_SETA = { '→': 'R', '←': 'L', '↑': 'U', '↓': 'D' };
 const SYM = {
   o: { nome: 'laranja', ch: '●' },
-  p: { nome: 'roxo', ch: '▲' },
+  p: { nome: 'roxa', ch: '▲' },
   g: { nome: 'verde', ch: '■' }
 };
+const LIMITE_PASSOS = 1500;
 
 // ---------- construtores curtos para escrever missões ----------
+const x = v => typeof v === 'number' ? { k: 'num', v } : typeof v === 'string' ? { k: 'str', v }
+  : typeof v === 'boolean' ? { k: 'bool', v } : v;
 const N = v => ({ k: 'num', v });
+const T = v => ({ k: 'str', v });
+const BO = v => ({ k: 'bool', v });
 const V = n => ({ k: 'var', n });
-const B = (op, a, b) => ({ k: 'bin', op, a, b });
+const B = (op, a, b) => ({ k: 'bin', op, a: x(a), b: x(b) });
+const NAO = e => ({ k: 'not', e: x(e) });
 const S = (s, neg) => ({ k: 'sym', s, neg: !!neg });
+const PL = { k: 'tile' };
+const LIVRE = d => ({ k: 'free', d });
+const LS = items => ({ k: 'list', items: items.map(x) });
+const IX = (l, i) => ({ k: 'idx', l: x(l), i: x(i) });
+const TAM = l => ({ k: 'len', l: x(l) });
+const REC = o => ({ k: 'rec', f: Object.keys(o).map(n => ({ n, e: x(o[n]) })) });
+const FLD = (e, n) => ({ k: 'fld', e: x(e), n });
+const FC = (name, args) => ({ k: 'fcall', name, args: (args || []).map(x) });
+
 const mv = d => ({ k: 'move', d });
 const R_ = mv('R'), L_ = mv('L'), U_ = mv('U'), D_ = mv('D');
 const ENT = { k: 'deliver' };
-const rep = (n, body, v) => ({ k: 'repeat', n: typeof n === 'number' ? N(n) : n, v, body });
-const se = (c, then, els) => ({ k: 'if', c, then, els });
-const enq = (c, body) => ({ k: 'while', c, body });
-const set = (n, e) => ({ k: 'set', n, e: typeof e === 'number' ? N(e) : e });
-const esc = e => ({ k: 'print', e });
+const mvx = e => ({ k: 'movex', e: x(e) });
+const rep = (n, body, v) => ({ k: 'repeat', n: x(n), v, body });
+const cada = (v, l, body) => ({ k: 'each', v, l: x(l), body });
+const se = (c, then, els) => ({ k: 'if', c: x(c), then, els });
+const enq = (c, body) => ({ k: 'while', c: x(c), body });
+const set = (n, e) => ({ k: 'set', n, e: x(e) });
+const setx = (t, e) => ({ k: 'setx', t, e: x(e) });
+const esc = e => ({ k: 'print', e: x(e) });
+const ler = n => ({ k: 'read', n });
+const def = (name, params, body) => ({ k: 'def', name, params: params || [], body });
+const call = (name, args) => ({ k: 'call', name, args: (args || []).map(x) });
+const ret = e => ({ k: 'ret', e: x(e) });
 
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
 // ---------- leitura do mapa ----------
+// '.' rua, 'H' casa, 'o' 'p' 'g' calçadas com símbolo, 't' enfeite, '#' parede, '0'-'9' placa
 function parseMap(rows) {
   const h = rows.length, w = rows[0].length;
-  const cell = (x, y) => rows[((y % h) + h) % h][((x % w) + w) % w];
+  const cell = (cx, cy) => rows[((cy % h) + h) % h][((cx % w) + w) % w];
   const houses = [];
-  rows.forEach((r, y) => [...r].forEach((c, x) => { if (c === 'H') houses.push(x + ',' + y); }));
+  rows.forEach((r, y) => [...r].forEach((c, cx) => { if (c === 'H') houses.push(cx + ',' + y); }));
   return { rows, w, h, cell, houses };
 }
+const ehPlaca = c => c >= '0' && c <= '9';
 
-// ---------- tradutor AST -> linhas de pseudocódigo ----------
+// ---------- percurso genérico das subexpressões ----------
+function filhos(e) {
+  if (!e || typeof e !== 'object') return [];
+  switch (e.k) {
+    case 'bin': return [e.a, e.b];
+    case 'not': return [e.e];
+    case 'list': return e.items;
+    case 'idx': return [e.l, e.i];
+    case 'len': return [e.l];
+    case 'rec': return e.f.map(f => f.e);
+    case 'fld': return [e.e];
+    case 'fcall': return e.args;
+    default: return [];
+  }
+}
+// expressões diretamente ligadas a um comando, na ordem em que aparecem na linha
+function exprsDe(st) {
+  switch (st.k) {
+    case 'set': case 'print': case 'ret': case 'movex': return [st.e];
+    case 'setx': return [st.t, st.e];
+    case 'repeat': return [st.n];
+    case 'each': return [st.l];
+    case 'if': case 'while': return [st.c];
+    case 'call': return st.args;
+    default: return [];
+  }
+}
+const blocosDe = st => [st.body, st.then, st.els].filter(Boolean);
+
+// Lista, na ordem do código, os números e os movimentos (usada para plantar e achar erros)
+function coletar(ast) {
+  const nums = [], moves = [];
+  const ex = e => { if (!e) return; if (e.k === 'num') nums.push(e); filhos(e).forEach(ex); };
+  const bl = list => list.forEach(st => {
+    if (st.k === 'move') moves.push(st);
+    exprsDe(st).forEach(ex);
+    if (st.k === 'if') { bl(st.then); if (st.els) bl(st.els); } else blocosDe(st).forEach(bl);
+  });
+  bl(ast);
+  return { nums, moves };
+}
+
+// ---------- tradutor: árvore -> linhas de pseudocódigo ----------
+const PREC = { 'ou': 1, 'e': 2, '=': 3, '≠': 3, '>': 3, '<': 3, '≥': 3, '≤': 3, '+': 4, '-': 4, '*': 5, '/': 5, '%': 5 };
+function fmtValor(v) {
+  if (v === true) return 'verdadeiro';
+  if (v === false) return 'falso';
+  if (Array.isArray(v)) return '[' + v.map(fmtValor).join(', ') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).map(k => k + ': ' + fmtValor(v[k])).join(', ') + '}';
+  if (typeof v === 'string') return DIR_DA_SETA[v] ? v : '"' + v + '"';
+  return String(v);
+}
 function exprHTML(e, opts) {
   opts = opts || {};
-  if (e.k === 'num') {
-    if (opts.editable) return '<span class="num ed" data-nid="' + e.id + '">' + e.v + '</span>';
-    return '<span class="num">' + e.v + '</span>';
+  const h = c => exprHTML(c, opts);
+  switch (e.k) {
+    case 'num': return opts.editable ? '<span class="num ed" data-nid="' + e.id + '">' + e.v + '</span>' : '<span class="num">' + e.v + '</span>';
+    case 'str': return '<span class="str">' + (DIR_DA_SETA[e.v] ? e.v : '"' + e.v + '"') + '</span>';
+    case 'bool': return '<span class="kw">' + (e.v ? 'verdadeiro' : 'falso') + '</span>';
+    case 'var': return '<span class="var">' + e.n + '</span>';
+    case 'bin': {
+      const par = (c, dir) => {
+        const s = h(c);
+        if (c.k !== 'bin') return s;
+        const pc = PREC[c.op], pp = PREC[e.op];
+        return (pc < pp || (pc === pp && dir === 'b' && (e.op === '-' || e.op === '/' || e.op === '%'))) ? '(' + s + ')' : s;
+      };
+      const op = (e.op === 'e' || e.op === 'ou') ? '<span class="kw">' + e.op + '</span>' : e.op;
+      return par(e.a, 'a') + ' ' + op + ' ' + par(e.b, 'b');
+    }
+    case 'not': return '<span class="kw">não</span> ' + (e.e.k === 'bin' ? '(' + h(e.e) + ')' : h(e.e));
+    case 'sym': return (e.neg ? '<span class="kw">não</span> ' : '') + '<span class="sym s-' + e.s + '" title="calçada ' + SYM[e.s].nome + '">' + SYM[e.s].ch + '</span>';
+    case 'tile': return '<span class="fn">placa()</span>';
+    case 'free': return '<span class="fn">livre(</span>' + SETA[e.d] + '<span class="fn">)</span>';
+    case 'list': return '[' + e.items.map(h).join(', ') + ']';
+    case 'idx': return h(e.l) + '[' + h(e.i) + ']';
+    case 'len': return '<span class="fn">tamanho</span>(' + h(e.l) + ')';
+    case 'rec': return '{' + e.f.map(f => f.n + ': ' + h(f.e)).join(', ') + '}';
+    case 'fld': return h(e.e) + '.' + e.n;
+    case 'fcall': return '<span class="fn">' + e.name + '</span>(' + e.args.map(h).join(', ') + ')';
   }
-  if (e.k === 'var') return '<span class="var">' + e.n + '</span>';
-  if (e.k === 'bin') return exprHTML(e.a, opts) + ' ' + e.op + ' ' + exprHTML(e.b, opts);
-  if (e.k === 'sym') return (e.neg ? '<span class="kw">não</span> ' : '') + '<span class="sym s-' + e.s + '" title="casa ' + SYM[e.s].nome + '">' + SYM[e.s].ch + '</span>';
-  if (e.k === 'str') return '<span class="str">"' + e.v + '"</span>';
-  return '';
-}
-function exprText(e) {
-  if (e.k === 'num') return String(e.v);
-  if (e.k === 'var') return e.n;
-  if (e.k === 'bin') return exprText(e.a) + ' ' + e.op + ' ' + exprText(e.b);
-  if (e.k === 'sym') return (e.neg ? 'não ' : '') + SYM[e.s].ch + ' ' + SYM[e.s].nome;
   return '';
 }
 
-// Numera os nós, gera as linhas e devolve o mapa nó -> linha
+// Numera os nós, gera as linhas e devolve o mapa nó -> linha.
+// As linhas de fechamento ("}") também recebem identificador, para o foco passar por elas.
 function layout(ast, opts) {
   opts = opts || {};
   let nid = 0;
   const lines = [], lineOf = {};
-  const tag = e => { if (!e || typeof e !== 'object') return; e.id = 'e' + (nid++); if (e.a) tag(e.a); if (e.b) tag(e.b); };
+  const tag = e => { if (!e || typeof e !== 'object') return; e.id = 'e' + (nid++); filhos(e).forEach(tag); };
   const kw = w => '<span class="kw">' + w + '</span>';
+  const fn = w => '<span class="fn">' + w + '</span>';
+  const push = (html, ind, id) => { if (id) lineOf[id] = lines.length; lines.push({ html, ind, nid: id }); };
+  function ifChain(st, ind, prefix) {
+    tag(st.c);
+    push(prefix + kw('se') + ' ' + exprHTML(st.c, opts) + ' {', ind, st.id);
+    block(st.then, ind + 1);
+    if (st.els) {
+      if (st.els.length === 1 && st.els[0].k === 'if') {
+        st.els[0].id = 'n' + (nid++);
+        ifChain(st.els[0], ind, '} ' + kw('senão') + ' ');
+        return;
+      }
+      push('} ' + kw('senão') + ' {', ind, st.id + ':s');
+      block(st.els, ind + 1);
+    }
+    push('}', ind, st.id + '}');
+  }
   function block(list, ind) {
     list.forEach(st => {
       st.id = 'n' + (nid++);
-      const L = lines.length;
-      lineOf[st.id] = L;
-      let html = '';
-      if (st.k === 'move') html = '<span class="fn">' + MOVE_WORD[st.d] + '</span>';
-      else if (st.k === 'deliver') html = '<span class="fn">entregar()</span>';
-      else if (st.k === 'set') { tag(st.e); html = '<span class="var">' + st.n + '</span> ← ' + exprHTML(st.e, opts); }
-      else if (st.k === 'print') { tag(st.e); html = '<span class="fn">escrever</span>(' + exprHTML(st.e, opts) + ')'; }
-      else if (st.k === 'repeat') {
-        tag(st.n);
-        html = st.v ? kw('para') + ' <span class="var">' + st.v + '</span> ' + kw('de') + ' 1 ' + kw('até') + ' ' + exprHTML(st.n, opts) + ' {'
-                    : kw('repetir') + ' (' + exprHTML(st.n, opts) + ') {';
-      }
-      else if (st.k === 'if') { tag(st.c); html = kw('se') + ' ' + exprHTML(st.c, opts) + ' {'; }
-      else if (st.k === 'while') { tag(st.c); html = kw('enquanto') + ' ' + exprHTML(st.c, opts) + ' {'; }
-      lines.push({ html, ind, nid: st.id });
-      if (st.k === 'repeat' || st.k === 'while') { block(st.body, ind + 1); lines.push({ html: '}', ind }); }
-      if (st.k === 'if') {
-        block(st.then, ind + 1);
-        if (st.els) { lines.push({ html: '} ' + kw('senão') + ' {', ind }); block(st.els, ind + 1); }
-        lines.push({ html: '}', ind });
+      exprsDe(st).forEach(e => { if (st.k !== 'if') tag(e); });
+      const E = e => exprHTML(e, opts);
+      switch (st.k) {
+        case 'move': push(opts.editable ? '<span class="fn dir ed" data-nid="' + st.id + '">' + MOVE_WORD[st.d] + '</span>' : fn(MOVE_WORD[st.d]), ind, st.id); break;
+        case 'deliver': push(fn('entregar()'), ind, st.id); break;
+        case 'movex': push(fn('mover') + '(' + E(st.e) + ')', ind, st.id); break;
+        case 'set': push('<span class="var">' + st.n + '</span> ← ' + E(st.e), ind, st.id); break;
+        case 'setx': push(E(st.t) + ' ← ' + E(st.e), ind, st.id); break;
+        case 'print': push(fn('escrever') + '(' + E(st.e) + ')', ind, st.id); break;
+        case 'read': push(fn('ler') + '(<span class="var">' + st.n + '</span>)', ind, st.id); break;
+        case 'ret': push(kw('retorna') + ' ' + E(st.e), ind, st.id); break;
+        case 'call': push(fn(st.name) + '(' + st.args.map(E).join(', ') + ')', ind, st.id); break;
+        case 'repeat':
+          push(st.v ? kw('para') + ' <span class="var">' + st.v + '</span> ' + kw('de') + ' 1 ' + kw('até') + ' ' + E(st.n) + ' {'
+                    : kw('repetir') + ' (' + E(st.n) + ') {', ind, st.id);
+          block(st.body, ind + 1); push('}', ind, st.id + '}'); break;
+        case 'each':
+          push(kw('para cada') + ' <span class="var">' + st.v + '</span> ' + kw('em') + ' ' + E(st.l) + ' {', ind, st.id);
+          block(st.body, ind + 1); push('}', ind, st.id + '}'); break;
+        case 'while':
+          push(kw('enquanto') + ' ' + E(st.c) + ' {', ind, st.id);
+          block(st.body, ind + 1); push('}', ind, st.id + '}'); break;
+        case 'if': ifChain(st, ind, ''); break;
+        case 'def':
+          push(kw('função') + ' ' + fn(st.name) + '(' + st.params.map(p => '<span class="var">' + p + '</span>').join(', ') + ') {', ind, st.id);
+          block(st.body, ind + 1); push('}', ind, st.id + '}'); break;
       }
     });
   }
@@ -93,135 +208,158 @@ function layout(ast, opts) {
 }
 
 // ---------- interpretador: gera o rastro completo ----------
-// Cada passo: {nid, kind:'in'|'auto', key?, x, y, vars, lit, ctx, note?}
-function simulate(mission, ast) {
+// Cada passo: { nid, kind: 'in' | 'auto', key?, x, y, vars, lit, out, ctx, loop?, cond? }
+// 'in' é um passo que o estudante executa (mover ou entregar); 'auto' o computador mostra.
+function simulate(mission, ast, opts) {
+  opts = opts || {};
   const M = parseMap(mission.map);
-  let x = mission.start[0], y = mission.start[1];
-  const vars = {}, lit = {}, steps = [], out = [];
-  let fail = null, guard = 0;
-  const LIMIT = 600;
+  let px = mission.start[0], py = mission.start[1];
+  const globais = {}, pilha = [], lit = {}, steps = [], out = [], delivered = [];
+  const entrada = (mission.entrada || []).slice();
+  const funcs = {};
+  ast.forEach(st => { if (st.k === 'def') funcs[st.name] = st; });
+  let fail = null;
+  const RET = {}, ESTOURO = {};
+  const visao = () => Object.assign({}, globais, pilha.length ? pilha[pilha.length - 1] : null);
   const snap = (nid, kind, extra) => {
-    steps.push(Object.assign({ nid, kind, x, y, vars: Object.assign({}, vars), lit: Object.assign({}, lit), out: out.slice() }, extra));
-    if (++guard > LIMIT) throw new Error('LIMITE');
+    steps.push(Object.assign({ nid, kind, x: px, y: py, vars: clone(visao()), lit: Object.assign({}, lit), out: out.slice(), prof: pilha.length }, extra));
+    if (steps.length > LIMITE_PASSOS) throw ESTOURO;
   };
+  const escopo = n => {
+    const topo = pilha[pilha.length - 1];
+    if (topo && (n in topo || !(n in globais))) return topo;
+    return globais;
+  };
+  const wrap = (v, m) => ((v % m) + m) % m;
   const ev = e => {
-    if (e.k === 'num') return e.v;
-    if (e.k === 'var') return vars[e.n];
-    if (e.k === 'str') return e.v;
-    if (e.k === 'sym') { const r = M.cell(x, y) === e.s; return e.neg ? !r : r; }
-    const a = ev(e.a), b = ev(e.b);
-    switch (e.op) {
-      case '+': return a + b; case '-': return a - b; case '*': return a * b;
-      case '>': return a > b; case '<': return a < b; case '≥': return a >= b; case '≤': return a <= b;
-      case '=': return a === b; case '≠': return a !== b;
+    switch (e.k) {
+      case 'num': case 'str': case 'bool': return e.v;
+      case 'var': { const topo = pilha[pilha.length - 1]; return topo && e.n in topo ? topo[e.n] : globais[e.n]; }
+      case 'sym': { const r = M.cell(px, py) === e.s; return e.neg ? !r : r; }
+      case 'tile': { const c = M.cell(px, py); return ehPlaca(c) ? +c : 0; }
+      case 'free': { const d = DIRS[e.d]; return M.cell(px + d[0], py + d[1]) !== '#'; }
+      case 'not': return !ev(e.e);
+      case 'list': return e.items.map(ev);
+      case 'idx': return ev(e.l)[ev(e.i)];
+      case 'len': return ev(e.l).length;
+      case 'rec': { const o = {}; e.f.forEach(f => { o[f.n] = ev(f.e); }); return o; }
+      case 'fld': return ev(e.e)[e.n];
+      case 'fcall': return chamar(e.name, e.args.map(ev), null);
+      case 'bin': {
+        if (e.op === 'e') return !!(ev(e.a) && ev(e.b));
+        if (e.op === 'ou') return !!(ev(e.a) || ev(e.b));
+        const a = ev(e.a), b = ev(e.b);
+        switch (e.op) {
+          case '+': return a + b; case '-': return a - b; case '*': return a * b;
+          case '/': return Math.floor(a / b); case '%': return wrap(a, b);
+          case '>': return a > b; case '<': return a < b; case '≥': return a >= b; case '≤': return a <= b;
+          case '=': return a === b; case '≠': return a !== b;
+        }
+      }
     }
   };
+  function chamar(name, args, nidChamada) {
+    const f = funcs[name];
+    const quadro = {};
+    f.params.forEach((p, i) => { quadro[p] = args[i]; });
+    pilha.push(quadro);
+    snap(f.id, 'auto', { ctx: 'def' });
+    let valor;
+    try { run(f.body, 'func'); snap(f.id + '}', 'auto', { ctx: 'fim' }); }
+    catch (sinal) { if (sinal !== RET) { throw sinal; } valor = RET.v; }
+    pilha.pop();
+    if (nidChamada) snap(nidChamada, 'auto', { ctx: 'volta' });
+    return valor;
+  }
+  function andar(dir, st, ctx) {
+    const d = DIRS[dir], nx = wrap(px + d[0], M.w), ny = wrap(py + d[1], M.h);
+    let bloqueado = false;
+    if (M.cell(nx, ny) === '#') { bloqueado = true; if (!fail) fail = 'parede'; } else { px = nx; py = ny; }
+    snap(st.id, 'in', { key: dir, ctx, bloqueado });
+  }
   function run(list, ctx) {
     for (const st of list) {
-      if (st.k === 'move') {
-        const d = DIRS[st.d];
-        x = ((x + d[0]) % M.w + M.w) % M.w; y = ((y + d[1]) % M.h + M.h) % M.h;
-        snap(st.id, 'in', { key: st.d, ctx });
-      } else if (st.k === 'deliver') {
-        const k = x + ',' + y;
-        if (M.cell(x, y) === 'H') lit[k] = true; else if (!fail) fail = 'nobody';
-        snap(st.id, 'in', { key: 'E', ctx, ok: M.cell(x, y) === 'H' });
-      } else if (st.k === 'set') {
-        vars[st.n] = ev(st.e); snap(st.id, 'auto', { ctx });
-      } else if (st.k === 'print') {
-        out.push(String(ev(st.e))); snap(st.id, 'auto', { ctx });
-      } else if (st.k === 'repeat') {
-        const n = ev(st.n);
-        for (let i = 1; i <= n; i++) {
-          if (st.v) { vars[st.v] = i; snap(st.id, 'auto', { ctx: 'repeat' }); }
-          run(st.body, 'repeat');
+      switch (st.k) {
+        case 'def': break;
+        case 'move': andar(st.d, st, ctx); break;
+        case 'movex': andar(DIR_DA_SETA[ev(st.e)] || 'R', st, 'lista'); break;
+        case 'deliver': {
+          const k = px + ',' + py, casa = M.cell(px, py) === 'H';
+          delivered.push(k);
+          if (casa || opts.anyDeliver) lit[k] = true; else if (!fail) fail = 'ninguem';
+          snap(st.id, 'in', { key: 'E', ctx, ok: casa || !!opts.anyDeliver });
+          break;
         }
-      } else if (st.k === 'if') {
-        const c = ev(st.c); snap(st.id, 'auto', { ctx: 'if', cond: c });
-        if (c) run(st.then, 'if'); else if (st.els) run(st.els, 'if');
-      } else if (st.k === 'while') {
-        while (true) {
-          const c = ev(st.c); snap(st.id, 'auto', { ctx: 'while', cond: c });
-          if (!c) break;
-          run(st.body, 'while');
+        case 'set': { const v = ev(st.e); escopo(st.n)[st.n] = v; snap(st.id, 'auto', { ctx }); break; }
+        case 'setx': { const v = ev(st.e); ev(st.t.l)[ev(st.t.i)] = v; snap(st.id, 'auto', { ctx }); break; }
+        case 'read': { escopo(st.n)[st.n] = entrada.length ? entrada.shift() : 0; snap(st.id, 'auto', { ctx: 'ler' }); break; }
+        case 'print': { const v = ev(st.e); out.push(typeof v === 'string' ? v : fmtValor(v)); snap(st.id, 'auto', { ctx }); break; }
+        case 'ret': { RET.v = ev(st.e); snap(st.id, 'auto', { ctx: 'retorna' }); throw RET; }
+        case 'call': { snap(st.id, 'auto', { ctx: 'chama' }); chamar(st.name, st.args.map(ev), st.id); break; }
+        case 'repeat': {
+          const n = ev(st.n);
+          if (n <= 0) snap(st.id, 'auto', { ctx: 'repeat', loop: { i: 0, n } });
+          for (let i = 1; i <= n; i++) {
+            if (st.v) escopo(st.v)[st.v] = i;
+            snap(st.id, 'auto', { ctx: 'repeat', loop: { i, n } });
+            run(st.body, 'repeat');
+            snap(st.id + '}', 'auto', { ctx: 'fim' });
+          }
+          break;
+        }
+        case 'each': {
+          const l = ev(st.l).slice();
+          for (let i = 0; i < l.length; i++) {
+            escopo(st.v)[st.v] = l[i];
+            snap(st.id, 'auto', { ctx: 'each', loop: { i: i + 1, n: l.length } });
+            run(st.body, 'each');
+            snap(st.id + '}', 'auto', { ctx: 'fim' });
+          }
+          break;
+        }
+        case 'while': {
+          let i = 0;
+          while (true) {
+            const c = ev(st.c); i++;
+            snap(st.id, 'auto', { ctx: 'while', cond: c, loop: c ? { i } : { fim: true } });
+            if (!c) break;
+            run(st.body, 'while');
+            snap(st.id + '}', 'auto', { ctx: 'fim' });
+          }
+          break;
+        }
+        case 'if': {
+          const c = ev(st.c); snap(st.id, 'auto', { ctx: 'if', cond: c });
+          if (c) run(st.then, 'if'); else if (st.els) run(st.els, 'if');
+          break;
         }
       }
     }
   }
   let overflow = false;
-  try { run(ast, 'seq'); } catch (e) { overflow = true; }
+  try { run(ast, 'seq'); } catch (sinal) { if (sinal === ESTOURO || sinal instanceof RangeError) overflow = true; else if (sinal !== RET) throw sinal; }
   const allLit = M.houses.every(k => lit[k]);
-  return { steps, final: { x, y, vars: Object.assign({}, vars), lit, out }, fail, overflow, allLit, houses: M.houses };
+  return { steps, final: { x: px, y: py, vars: clone(globais), lit, out }, fail, overflow, allLit, houses: M.houses, delivered };
 }
 
-// espelha uma missão na horizontal (para rejogar sem decorar)
+// espelha uma missão na horizontal (para rejogar sem decorar o caminho)
 function mirrorMission(m) {
   const c = clone(m);
   c.map = m.map.map(r => [...r].reverse().join(''));
   c.start = [m.map[0].length - 1 - m.start[0], m.start[1]];
-  if (c.predict) c.predict = c.predict.slice();
-  const sw = list => list.forEach(st => {
-    if (st.k === 'move') st.d = st.d === 'R' ? 'L' : st.d === 'L' ? 'R' : st.d;
-    ['body', 'then', 'els'].forEach(k => st[k] && sw(st[k]));
+  const troca = d => d === 'R' ? 'L' : d === 'L' ? 'R' : d;
+  const ex = e => { if (!e) return; if (e.k === 'free') e.d = troca(e.d); if (e.k === 'str' && (e.v === '→' || e.v === '←')) e.v = e.v === '→' ? '←' : '→'; filhos(e).forEach(ex); };
+  const bl = list => list.forEach(st => {
+    if (st.k === 'move') st.d = troca(st.d);
+    exprsDe(st).forEach(ex);
+    blocosDe(st).forEach(bl);
   });
-  sw(c.code);
+  bl(c.code); if (c.certo) bl(c.certo);
   return c;
 }
 
-// ---------- missões ----------
-const CHAPTERS = [
-  { id: 1, titulo: 'Primeiro dia', frase: 'Primeiro dia de entregas. A padaria abriu cedo e o bairro espera.', conceito: 'Sequência' },
-  { id: 2, titulo: 'Ruas que se repetem', frase: 'As ruas do bairro se repetem. Quem enxerga o padrão chega antes.', conceito: 'Repetição' },
-  { id: 3, titulo: 'A mochila', frase: 'A mochila leva pães contados. Cada entrega muda o que sobra.', conceito: 'Variáveis' },
-  { id: 4, titulo: 'Decisões no caminho', frase: 'As calçadas coloridas avisam: aqui, o caminho pode mudar.', conceito: 'Condições' }
-];
-
-const MISSIONS = [
-  // Capítulo 1: sequência
-  { id: '1-1', cap: 1, modo: 'rastrear', titulo: 'Pão para Ana', tutorial: true,
-    map: ['....H'], start: [0, 0], code: [R_, R_, R_, R_, ENT] },
-  { id: '1-2', cap: 1, modo: 'rastrear', titulo: 'Leite para Seu João',
-    map: ['..H', '...', '...'], start: [0, 2], code: [U_, U_, R_, R_, ENT] },
-  { id: '1-3', cap: 1, modo: 'rastrear', titulo: 'O desenho engana',
-    map: ['.tttt', '.t..t', '....H'], start: [0, 2], code: [R_, R_, R_, R_, ENT] },
-  { id: '1-4', cap: 1, modo: 'prever', titulo: 'Onde ele para?',
-    map: ['....', '....', '....'], start: [0, 0], code: [R_, D_, R_, U_, R_, D_, D_] },
-
-  // Capítulo 2: repetição
-  { id: '2-1', cap: 2, modo: 'rastrear', titulo: 'A rua comprida',
-    map: ['.....H'], start: [0, 0], code: [rep(5, [R_]), ENT] },
-  { id: '2-2', cap: 2, modo: 'rastrear', titulo: 'Escada de quarteirões',
-    map: ['....', '....', '....', '...H'], start: [0, 0], code: [rep(3, [R_, D_]), ENT] },
-  { id: '2-3', cap: 2, modo: 'rastrear', titulo: 'A rua dá a volta',
-    map: ['H...'], start: [1, 0], code: [rep(7, [R_]), ENT] },
-  { id: '2-4', cap: 2, modo: 'depurar', titulo: 'Remédio para Dona Rosa', alvo: 'a casa de Dona Rosa',
-    map: ['....H'], start: [0, 0], code: [rep(3, [R_]), ENT] },
-  { id: '2-5', cap: 2, modo: 'prever', titulo: 'Volta e sobe',
-    map: ['.....', '.....', '.....'], start: [0, 2], code: [rep(2, [rep(2, [R_]), U_])] },
-
-  // Capítulo 3: variáveis
-  { id: '3-1', cap: 3, modo: 'rastrear', titulo: 'Dois pães, duas casas',
-    map: ['.HH.'], start: [0, 0], code: [set('pães', 2), rep(2, [R_, ENT, set('pães', B('-', V('pães'), N(1)))])] },
-  { id: '3-2', cap: 3, modo: 'rastrear', titulo: 'Contando os passos',
-    map: ['...H.'], start: [0, 0], code: [set('passos', 3), enq(B('>', V('passos'), N(0)), [R_, set('passos', B('-', V('passos'), N(1)))]), ENT] },
-  { id: '3-3', cap: 3, modo: 'prever', titulo: 'Quantas entregas?', predictVar: 'entregas',
-    map: ['...', '...', '...', '...'], start: [1, 0], code: [set('entregas', 0), rep(3, [D_, set('entregas', B('+', V('entregas'), N(1)))])] },
-  { id: '3-4', cap: 3, modo: 'depurar', titulo: 'Pão para três casas', alvo: 'as três casas',
-    map: ['.HHH'], start: [0, 0], code: [set('pães', 2), enq(B('>', V('pães'), N(0)), [R_, ENT, set('pães', B('-', V('pães'), N(1)))])] },
-  { id: '3-5', cap: 3, modo: 'rastrear', titulo: 'O caderno de entregas',
-    map: ['.HHH'], start: [0, 0], code: [set('entregas', 0), rep(3, [R_, ENT, set('entregas', B('+', V('entregas'), N(1)))]), esc(V('entregas'))] },
-
-  // Capítulo 4: condições com símbolos
-  { id: '4-1', cap: 4, modo: 'rastrear', titulo: 'A calçada laranja',
-    map: ['..H.', '.o..'], start: [0, 1], code: [R_, se(S('o'), [U_]), R_, ENT] },
-  { id: '4-2', cap: 4, modo: 'rastrear', titulo: 'Se não é enquanto',
-    map: ['.o...', '..o..', '...o.', '....H'], start: [0, 0], code: [rep(4, [se(S('o'), [D_]), R_]), ENT] },
-  { id: '4-3', cap: 4, modo: 'rastrear', titulo: 'Subir ou seguir',
-    map: ['....', '..H.', '..p.', '.p..'], start: [0, 3], code: [rep(4, [se(S('p'), [U_], [R_])]), ENT] },
-  { id: '4-4', cap: 4, modo: 'prever', titulo: 'Enquanto for verde',
-    map: ['ggg..', '.....'], start: [0, 0], code: [enq(S('g'), [R_]), D_] },
-  { id: '4-5', cap: 4, modo: 'depurar', titulo: 'Carta para a creche', alvo: 'a creche',
-    map: ['..o..', '....H'], start: [0, 0], code: [rep(3, [R_, se(S('o'), [D_])]), ENT] }
-];
-
-if (typeof module !== 'undefined') module.exports = { MISSIONS, CHAPTERS, layout, simulate, mirrorMission, clone, parseMap, exprText, SYM, MOVE_NOME, SETA };
+const RoadBitMotor = { DIRS, MOVE_WORD, MOVE_NOME, SETA, DIR_DA_SETA, SYM, x, N, T, BO, V, B, NAO, S, PL, LIVRE, LS, IX, TAM, REC, FLD, FC,
+  mv, R_, L_, U_, D_, ENT, mvx, rep, cada, se, enq, set, setx, esc, ler, def, call, ret,
+  clone, parseMap, ehPlaca, coletar, layout, simulate, mirrorMission, fmtValor };
+if (typeof module !== 'undefined') module.exports = RoadBitMotor;
+else if (typeof window !== 'undefined') window.RoadBitMotor = RoadBitMotor;
