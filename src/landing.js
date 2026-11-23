@@ -13,7 +13,7 @@ const linhas = V.versoes.map(v => `
         <header><b>v${esc(v.versao)}</b><span>${esc(v.nome)} · ${data(v.data)}</span>${v.versao === V.atual ? '<em>atual</em>' : ''}</header>
         <p>${esc(v.resumo)}</p>
         <nav>
-          <a href="${v.jogo}">Jogo</a>${v.apresentacao ? `\n          <a href="${v.apresentacao}">Apresentação</a>` : ''}
+          <a href="${v.jogo}">Jogo</a>${v.apresentacao ? `\n          <a href="${v.apresentacao}">${v.apresentacao.endsWith('.pptx') ? 'Apresentação (.pptx)' : 'Apresentação'}</a>` : ''}
           ${v.docs.map(d => `<a href="${d.url}">${esc(d.titulo)}</a>`).join('\n          ')}
           <a href="https://github.com/cleoquintiliano/roadbit/tree/${v.commit}">Código (${v.tag})</a>
         </nav>

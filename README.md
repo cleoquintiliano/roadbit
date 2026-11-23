@@ -10,7 +10,8 @@ O estudante conduz um robô mensageiro pela cidade lendo um código: executa cad
 | Jogo, versão mais recente | https://cleoquintiliano.github.io/roadbit/jogo/ |
 | Jogo v0.2 | https://cleoquintiliano.github.io/roadbit/versoes/v0.2/jogo/ |
 | Jogo v0.1 (demonstração, O Mensageiro) | https://cleoquintiliano.github.io/roadbit/versoes/v0.1/jogo/ |
-| Apresentação (v0.1) | https://cleoquintiliano.github.io/roadbit/versoes/v0.1/apresentacao/ |
+| Apresentação do recurso para professores (v0.2, .pptx) | https://cleoquintiliano.github.io/roadbit/versoes/v0.2/apresentacao/RoadBit-v0.2-recurso-educacional.pptx |
+| Apresentação da proposta (v0.1) | https://cleoquintiliano.github.io/roadbit/versoes/v0.1/apresentacao/ |
 | Trilha de aprendizagem | [docs/trilha-de-aprendizagem.md](docs/trilha-de-aprendizagem.md) |
 | Game Design Document (GDD) | [docs/GDD.md](docs/GDD.md) |
 | Esboço da atividade (5W2H) | [docs/esboco-5W2H.md](docs/esboco-5W2H.md) |

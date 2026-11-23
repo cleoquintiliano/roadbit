@@ -9,7 +9,7 @@
       "nome": "RoadBit",
       "resumo": "Trilha completa: 16 marcos num mapa único, 192 missões, modo Explicar, cartões de conceito e visualização da execução.",
       "jogo": "versoes/v0.2/jogo/",
-      "apresentacao": null,
+      "apresentacao": "versoes/v0.2/apresentacao/RoadBit-v0.2-recurso-educacional.pptx",
       "docs": [
         {
           "titulo": "Trilha de aprendizagem",

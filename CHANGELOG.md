@@ -2,6 +2,11 @@
 
 Todas as mudanças relevantes do RoadBit ficam registradas aqui. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Cada versão publicada continua disponível em `versoes/vX.Y/` no GitHub Pages.
 
+## [Não lançado]
+
+### Adicionado
+- Apresentação do recurso para professores em .pptx, com animações, QR Codes, trilha, 5W2H, orientações de aplicação em sala e créditos de autoria (`versoes/v0.2/apresentacao/`).
+
 ## [0.2.0] - 2026-11-17
 
 Primeira versão com a trilha de aprendizagem completa. O jogo passa a se chamar **RoadBit**.
