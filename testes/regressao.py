@@ -16,10 +16,10 @@ def confere(nome, ok, detalhe=''):
         falhas.append(nome)
 
 
-def nova_pagina(nav, w=1366, h=768, tudo=False):
+def nova_pagina(nav, w=1366, h=768, tudo=False, sufixo=None):
     pg = nav.new_page(viewport={'width': w, 'height': h})
     pg.on('pageerror', lambda e: falhas.append('erro JS: ' + str(e)))
-    pg.goto(ARQ + ('?tudo' if tudo else ''))
+    pg.goto(ARQ + (sufixo if sufixo is not None else ('?tudo' if tudo else '?semtour')))
     pg.evaluate('localStorage.clear()')
     pg.reload()
     return pg
@@ -109,6 +109,38 @@ with sync_playwright() as p:
     r = pg.evaluate("() => document.getElementById('banner').textContent")
     confere('11. Sem teste de mesa na tela, a mensagem cita o quadro de variáveis', 'quadro de variáveis' in r and 'teste de mesa' not in r, r)
     pg.close()
+
+    # 12. Tour guiado (v0.3.0): aparece na primeira vez, pode ser pulado e não repete
+    pg = nova_pagina(nav, sufixo='')
+    pg.click('#playBtn'); pg.wait_for_timeout(400)
+    r = pg.evaluate("() => ({ on: document.getElementById('tourOv').classList.contains('on'), k: document.getElementById('tourK').textContent })")
+    confere('12a. Tour do mapa abre ao entrar no mapa pela primeira vez', r['on'] and r['k'].startswith('Como jogar · 1 de'), r)
+    pg.keyboard.press('Escape')
+    pg.click('#contBtn'); pg.wait_for_timeout(300)
+    n = pg.evaluate("() => document.getElementById('tourK').textContent")
+    confere('12b. Tour da missão abre na primeira missão', pg.evaluate("document.getElementById('tourOv').classList.contains('on')"), n)
+    idx = pg.evaluate("() => window.RoadBit.G().idx")
+    for _ in range(12):
+        if not pg.evaluate("document.getElementById('tourOv').classList.contains('on')"): break
+        pg.click('#tourNext'); pg.wait_for_timeout(120)
+    r = pg.evaluate("() => ({ tour: document.getElementById('tourOv').classList.contains('on'), conceito: document.getElementById('concOv').classList.contains('on') })")
+    confere('12c. Ao terminar o tour, abre o cartão de conceito e o foco ainda não andou', not r['tour'] and r['conceito'] and idx == 0, r)
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
+    pg.evaluate("() => window.RoadBit.openMission('1-1')"); pg.wait_for_timeout(200)
+    confere('12d. O tour não repete na segunda vez', not pg.evaluate("document.getElementById('tourOv').classList.contains('on')"))
+    pg.evaluate("() => { window.RoadBit.P.seen[1] = 1; window.RoadBit.openMission('1-4'); }"); pg.wait_for_timeout(200)
+    confere('12e. O primeiro Prever mostra a dica do modo', pg.evaluate("document.getElementById('tourT').textContent") == 'Modo Prever')
+    pg.close()
+    for w, h in [(360, 740), (1366, 768)]:
+        pg = nova_pagina(nav, w, h, sufixo='')
+        fora = pg.evaluate("""() => new Promise(res => { const R = window.RoadBit, prob = [];
+          const ve = nome => { const c = document.getElementById('tourCard').getBoundingClientRect(); if (c.left < 0 || c.top < 0 || c.right > innerWidth || c.bottom > innerHeight) prob.push(nome); };
+          document.getElementById('playBtn').click();
+          setTimeout(() => { while (R.tour()) { ve('mapa ' + document.getElementById('tourT').textContent); document.getElementById('tourNext').click(); }
+            R.openMission('1-1'); while (R.tour()) { ve('missão ' + document.getElementById('tourT').textContent); document.getElementById('tourNext').click(); }
+            res(prob); }, 300); })""")
+        confere('12f. Cartão do tour dentro da tela em ' + str(w) + 'x' + str(h), not fora, fora)
+        pg.close()
     nav.close()
 
 print(('Tudo certo.' if not falhas else str(len(falhas)) + ' falha(s).'))

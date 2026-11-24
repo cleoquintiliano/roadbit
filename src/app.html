@@ -263,6 +263,17 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
   #entBtn{height:94px;width:100px}
   .controls{gap:14px}
 }
+/* ---------- tour guiado ---------- */
+#tourOv{position:fixed;inset:0;z-index:70;display:none}
+#tourOv.on{display:block}
+#tourHole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(31,42,68,.62);transition:all .25s ease;pointer-events:none}
+#tourHole.none{width:0;height:0;left:50%;top:40%}
+#tourCard{position:fixed;width:min(380px,calc(100vw - 24px));background:var(--white);border-radius:20px;padding:16px 18px;box-shadow:0 18px 50px rgba(31,42,68,.3);display:flex;flex-direction:column;gap:10px;transition:left .25s ease,top .25s ease}
+#tourCard .tk{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal-d)}
+#tourCard h3{font-size:20px}
+#tourCard p{margin:0;font-size:17px;line-height:1.4;color:var(--ink2)}
+#tourCard .tacts{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+#tourCard .btn{min-height:44px;padding:8px 18px;font-size:16px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -276,6 +287,7 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
   <div class="row">
     <button class="btn primary" id="playBtn">Jogar</button>
     <button class="btn ghost" id="codeBtn">Tenho um código</button>
+    <button class="btn ghost" id="howBtn">Como jogar</button>
   </div>
   <p class="note">O progresso fica salvo neste aparelho. Para continuar em outro, use o código de progresso que aparece no mapa.</p>
   <!--SKYLINE-->
@@ -286,7 +298,7 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
   <div class="bar">
     <button class="btn dark" id="homeBtn" aria-label="Voltar ao início">← Início</button>
     <h2>Road<span>Bit</span></h2>
-    <button class="btn ghost" id="myCodeBtn">Meu código</button>
+    <div class="row" style="display:flex;gap:8px"><button class="btn ghost" id="mapTourBtn" aria-label="Como jogar: rever o tour">Como jogar</button><button class="btn ghost" id="myCodeBtn">Meu código</button></div>
   </div>
   <div class="cont" id="contBox"><div class="ci"><small id="contK">Continuar</small><b id="contT"></b></div><button class="btn sun" id="contBtn">Jogar</button></div>
   <div class="citybar"><span id="cityTxt"></span><div class="track"><div class="fill" id="cityFill"></div></div></div>
@@ -339,6 +351,10 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
 
 <div class="toast" id="toast" role="status"></div>
 
+<div id="tourOv" role="dialog" aria-modal="true" aria-labelledby="tourT"><div id="tourHole"></div>
+  <div id="tourCard"><div class="tk" id="tourK"></div><h3 id="tourT"></h3><p id="tourP"></p>
+    <div class="tacts"><button class="btn dark" id="tourSkip">Pular tour</button><button class="btn primary" id="tourNext">Próximo</button></div></div></div>
+
 <div class="ov" id="marcoOv"><div class="card wide" id="marcoCard"></div></div>
 <div class="ov" id="concOv"><div class="card wide" id="concCard"></div></div>
 
@@ -376,9 +392,10 @@ const store = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 const TUDO = /[?&]tudo\b/.test(location.search);
+const SEM_TOUR = TUDO || /[?&]semtour\b/.test(location.search);
 
 // ---------- progresso (com migração da v0.1) ----------
-function novoP(){ return { stars:{}, hints:{}, seen:{}, mute:false, sweep:true, at:null, plays:{} }; }
+function novoP(){ return { stars:{}, hints:{}, seen:{}, mute:false, sweep:true, at:null, plays:{}, tours:{} }; }
 let P = Object.assign(novoP(), store.get(CHAVE) || {});
 if (!store.get(CHAVE)) {
   const velho = store.get('mensageiro.v1');
@@ -545,11 +562,90 @@ function openMarco(mid){
 }
 function openConceito(depois){
   const k = marcoDe(G.m.marco);
-  $('concCard').innerHTML = '<div class="kick' + (k.bonus ? ' b' : '') + '">' + (k.bonus ? 'Marco bônus' : 'Marco ' + k.id) + ' · ' + esc(k.lugar) + '</div><h2>' + esc(k.objeto) + '</h2>' + conceitoHTML(k) + '<div class="acts"><button class="btn primary" id="ccClose">Voltar à missão</button></div>';
+  $('concCard').innerHTML = '<div class="kick' + (k.bonus ? ' b' : '') + '">' + (k.bonus ? 'Marco bônus' : 'Marco ' + k.id) + ' · ' + esc(k.lugar) + '</div><h2>' + esc(k.objeto) + '</h2>' + conceitoHTML(k) + '<div class="acts"><button class="btn ghost" id="ccTour">Como jogar</button><button class="btn primary" id="ccClose">Voltar à missão</button></div>';
   ov('concOv', true);
   $('ccClose').onclick = () => { ov('concOv', false); if (typeof depois === 'function') depois(); };
+  $('ccTour').onclick = () => { ov('concOv', false); startTour(tourDoModo(G.m), () => { if (typeof depois === 'function') depois(); }, true); };
   later(() => $('ccClose').focus(), 50);
 }
+
+
+// ===================== tour guiado =====================
+// Cada passo aponta um elemento da tela e explica para que ele serve. O tour pode ser pulado
+// (botão ou Esc) e reaberto pelo botão "Como jogar". Cada tour aparece sozinho só na primeira vez.
+const TOURS = {
+  mapa: [
+    { el: '#contBox', t: 'Comece por aqui', p: 'O botão Jogar abre a próxima missão da trilha. Você não precisa procurar.' },
+    { el: '.mk', t: 'Os marcos da cidade', p: 'Cada marco é um lugar da cidade e um conceito de programação. São 12 missões em cada um. O próximo marco abre quando você completa 8.' },
+    { el: '.citybar', t: 'Seu progresso', p: 'A barra mostra quantas das missões você já concluiu. Cada missão acende uma casa da cidade.' },
+    { el: '#myCodeBtn', t: 'Código de progresso', p: 'O progresso fica salvo neste aparelho. Para continuar em outro, anote este código e use "Tenho um código" na tela inicial.' }
+  ],
+  missao: [
+    { el: '#codeP', t: 'O código', p: 'Você é o computador. O código diz o que o mensageiro faz, uma linha de cada vez, de cima para baixo.' },
+    { el: '#board', t: 'O mapa', p: 'O mensageiro anda pelas calçadas. Leve-o até as casas e entregue: cada entrega certa acende uma janela.' },
+    { el: '#controls', t: 'Os controles', p: 'Execute a linha destacada com as setas e o botão Entregar. Também dá para usar o teclado ou deslizar o dedo no mapa.' },
+    { el: '#banner', t: 'As orientações', p: 'Aqui aparece o que fazer. Se você errar, aparece uma pista sobre a linha e o laço onde você está.' },
+    { el: '#hintBtn', t: 'Dicas', p: 'Você tem 2 dicas em cada missão. Cada dica conta como um erro na hora das estrelas.' },
+    { el: '#concBtn', t: 'O conceito', p: 'Reveja a qualquer momento o que você está aprendendo neste marco, com um exemplo.' },
+    { el: '#sweepBtn', t: 'O foco', p: 'O foco passa pelas linhas para mostrar o caminho do computador. Aperte qualquer tecla para pular, ou desligue aqui.' }
+  ],
+  prever: [
+    { el: '#codeP', t: 'Modo Prever', p: 'Agora você não executa: leia o código todo e pense onde o mensageiro vai parar.' },
+    { el: '#board', t: 'Sua aposta', p: 'Toque na calçada onde ele vai terminar e aperte Conferir. O computador executa e mostra o caminho.' }
+  ],
+  preverVar: [
+    { el: '#codeP', t: 'Modo Prever', p: 'Leia o código sem executar e descubra o valor final da variável.' },
+    { el: '#pv', t: 'Sua aposta', p: 'Ajuste o valor com − e + e aperte Conferir. O computador executa e mostra cada mudança.' }
+  ],
+  depurar: [
+    { el: '#codeP', t: 'Modo Depurar', p: 'Este código tem um erro. Os números e as direções em laranja podem ser trocados.' },
+    { el: '#actBtn', t: 'Teste o conserto', p: 'Toque num valor laranja, mude e aperte Executar. Se não der certo, mude de novo.' }
+  ],
+  explicar: [
+    { el: '#codeP', t: 'Modo Explicar', p: 'Leia o código e pense no que ele faz do começo ao fim, não linha por linha.' },
+    { el: '#opts', t: 'Escolha a frase', p: 'Escolha a frase que explica o código. Se quiser, aperte "Ver executar" antes.' }
+  ]
+};
+let tour = null;
+function tourAlvo(sel){ const el = document.querySelector(sel); return el && el.offsetParent !== null && el.getBoundingClientRect().width > 0 ? el : null; }
+function startTour(nome, depois, forcar){
+  const passos = (TOURS[nome] || []).filter(q => tourAlvo(q.el));
+  if (!passos.length || (!forcar && (SEM_TOUR || P.tours[nome]))) { if (depois) depois(); return; }
+  P.tours[nome] = 1; save();
+  tour = { passos, i: 0, depois };
+  $('tourOv').classList.add('on');
+  tourMostra();
+}
+function tourMostra(){
+  const q = tour.passos[tour.i], el = tourAlvo(q.el), n = tour.passos.length;
+  $('tourK').textContent = 'Como jogar · ' + (tour.i + 1) + ' de ' + n;
+  $('tourT').textContent = q.t; $('tourP').textContent = q.p;
+  $('tourNext').textContent = tour.i === n - 1 ? 'Começar' : 'Próximo';
+  const h = $('tourHole'), c = $('tourCard'), W = innerWidth, H = innerHeight, m = 8;
+  if (el) {
+    const r = el.getBoundingClientRect();
+    const x = Math.max(4, r.left - m), y = Math.max(4, r.top - m), w = Math.min(W - 8, r.width + 2 * m), hh = Math.min(H - 8, r.height + 2 * m);
+    h.classList.remove('none'); Object.assign(h.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: hh + 'px' });
+    const cw = c.offsetWidth, ch = c.offsetHeight;
+    let top = y + hh + 12 + ch <= H - 8 ? y + hh + 12 : (y - 12 - ch >= 8 ? y - 12 - ch : H - ch - 12);
+    let left = Math.min(W - cw - 12, Math.max(12, x + w / 2 - cw / 2));
+    // se ainda cobre o alvo (alvo alto, como o código), o cartão vai para o lado com mais espaço
+    if (top < y + hh && top + ch > y && W - (x + w) > cw + 24) left = x + w + 12;
+    else if (top < y + hh && top + ch > y && x > cw + 24) left = x - cw - 12;
+    Object.assign(c.style, { left: left + 'px', top: top + 'px' });
+  } else { h.classList.add('none'); Object.assign(c.style, { left: (W - c.offsetWidth) / 2 + 'px', top: (H - c.offsetHeight) / 2 + 'px' }); }
+  later(() => $('tourNext').focus(), 30);
+}
+function tourFim(){
+  if (!tour) return;
+  const depois = tour.depois; tour = null;
+  $('tourOv').classList.remove('on');
+  if (depois) depois();
+}
+$('tourNext').onclick = () => { if (!tour) return; if (++tour.i >= tour.passos.length) tourFim(); else tourMostra(); };
+$('tourSkip').onclick = tourFim;
+window.addEventListener('resize', () => { if (tour) tourMostra(); });
+const tourDoModo = m => m.modo === 'prever' ? (m.soVar ? 'preverVar' : 'prever') : (m.modo === 'rastrear' ? 'missao' : m.modo);
 
 // ===================== missão =====================
 let G = {};
@@ -591,8 +687,8 @@ function openMission(id){
   renderState(-1);
   fit();
   // na primeira missão do marco, o foco só começa depois que o estudante fecha o cartão de conceito
-  if (!P.seen[m.marco] && !TUDO) { P.seen[m.marco] = 1; save(); openConceito(startMode); }
-  else startMode();
+  const conceitoDepois = () => { if (!P.seen[m.marco] && !TUDO) { P.seen[m.marco] = 1; save(); openConceito(startMode); } else startMode(); };
+  startTour(tourDoModo(m), conceitoDepois);
 }
 
 function updHint(){ const n = hintsLeft(); $('hintBtn').textContent = 'Dica ' + n; $('hintBtn').disabled = n <= 0; $('hintBtn').setAttribute('aria-label', 'Usar uma dica (' + n + ' nesta missão)'); }
@@ -795,7 +891,9 @@ function setupMode(){
 }
 const banner = t => { $('banner').textContent = t; };
 function startMode(){
-  if (G.mode === 'rastrear') { G.idx = 0; sweepTo(); }
+  if (G.iniciado || G.done) return;
+  G.iniciado = true;
+  if (G.mode === 'rastrear' && G.idx === 0) sweepTo();
 }
 
 // ----- rastrear com foco que passa linha a linha -----
@@ -1080,7 +1178,9 @@ function rpPlay(){
 }
 
 // ---------- eventos ----------
-$('playBtn').onclick = () => { show('mapa'); renderMap(); };
+$('playBtn').onclick = () => { show('mapa'); renderMap(); later(() => startTour('mapa'), 120); };
+$('howBtn').onclick = () => { P.tours = {}; save(); show('mapa'); renderMap(); later(() => startTour('mapa', null, true), 120); toast('O tour da missão aparece quando você abrir uma missão.'); };
+$('mapTourBtn').onclick = () => { P.tours = {}; save(); startTour('mapa', null, true); };
 $('homeBtn').onclick = () => show('home');
 $('contBtn').onclick = () => { const nx = proxima(); if (nx) openMission(nx.id); };
 $('backBtn').onclick = goMap;
@@ -1109,6 +1209,11 @@ $('code').addEventListener('click', () => { if (G.sweeping) { stopAll(); endSwee
 
 const KEYS = { ArrowUp: 'U', ArrowDown: 'D', ArrowLeft: 'L', ArrowRight: 'R', Enter: 'E', ' ': 'E' };
 document.addEventListener('keydown', e => {
+  if (tour) {
+    if (e.key === 'Escape') { tourFim(); e.preventDefault(); }
+    else if (e.key === 'ArrowRight' && e.target.id !== 'tourNext') { $('tourNext').click(); e.preventDefault(); }
+    return;
+  }
   const aberto = document.querySelector('.ov.on');
   if (aberto && e.key === 'Escape') {
     if (aberto.id === 'concOv') $('ccClose').click();
@@ -1151,7 +1256,7 @@ $('codeClose').onclick = () => ov('codeOv', false);
 window.addEventListener('resize', () => { if ($('mapa').classList.contains('on')) renderMap(); });
 
 // acesso para testes automáticos e para o professor
-window.RoadBit = { openMission, goMap, P, MISSIONS, G: () => G, endMission };
+window.RoadBit = { openMission, goMap, P, MISSIONS, G: () => G, endMission, startTour, tour: () => tour };
 if (location.hash.startsWith('#m=')) openMission(location.hash.slice(3));
 })();
 </script>
