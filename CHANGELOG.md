@@ -1,10 +1,28 @@
 # Histórico de mudanças
 
-Todas as mudanças relevantes do RoadBit ficam registradas aqui. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Cada versão publicada continua disponível em `versoes/vX.Y/` no GitHub Pages.
+Todas as mudanças relevantes do RoadBit ficam registradas aqui. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Cada versão publicada continua disponível em `versoes/vX.Y/` ou `versoes/vX.Y.Z/` no GitHub Pages.
 
-## [Não lançado]
+## [0.2.1] - 2026-11-24
+
+Versão de correção, a partir de um QA (teste de qualidade) da v0.2 jogando como estudante. Disponível em `versoes/v0.2.1/`.
+
+### Corrigido
+- Ao rejogar uma missão (mapa espelhado), o título, a dica guiada e as opções do Explicar agora também espelham. Antes, na 1-11 rejogada, a opção aceita como certa descrevia o caminho ao contrário (7 missões de Explicar e 2 guiadas).
+- "Próxima" segue no marco atual. Antes, com 8 missões feitas no marco 1, ela levava sempre de volta à 1-9.
+- Prever: errar 3 vezes não conclui mais a missão sozinho. A resposta fica marcada e o estudante precisa confirmá-la para concluir com 1 estrela. Depois de cada erro, o caminho fica na tela até ele tocar em "Tentar de novo".
+- A primeira tecla durante o foco só pula a animação e não conta mais como erro.
+- Na primeira missão de um marco, o foco só começa depois que o cartão de conceito é fechado.
+- A dica do Prever agora mostra o computador executando a primeira metade do programa; antes revelava variáveis vazias.
+- A mensagem do Prever cita o teste de mesa só quando ele está na tela.
+- No celular, o modo da missão aparece no subtítulo.
+- Esc fecha os cartões; missões sem movimento escondem o mapa vazio; o som de vitória não toca mais duas vezes.
+
+### Alterado
+- Dicas: 2 por missão, renovadas a cada missão, no lugar de 3 por marco.
+- O build recebe o número da versão (`node src/build.js 0.2.1`).
 
 ### Adicionado
+- Testes de regressão no navegador para cada problema do QA (`testes/regressao.py`).
 - Apresentação do recurso para professores em .pptx, com animações, QR Codes, trilha, 5W2H, orientações de aplicação em sala e créditos de autoria (`versoes/v0.2/apresentacao/`).
 
 ## [0.2.0] - 2026-11-17
@@ -49,5 +67,6 @@ Versão de demonstração, ainda com o nome **O Mensageiro**. Disponível em `ve
 - Código de progresso `M1-…` e progresso salvo no aparelho.
 - Apresentação com animações, GDD, esboço 5W2H e relatório de novidade.
 
+[0.2.1]: https://github.com/cleoquintiliano/roadbit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/cleoquintiliano/roadbit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cleoquintiliano/roadbit/releases/tag/v0.1.0

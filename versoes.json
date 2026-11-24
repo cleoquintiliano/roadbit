@@ -1,7 +1,35 @@
 {
   "projeto": "RoadBit",
-  "atual": "0.2",
+  "atual": "0.2.1",
   "versoes": [
+    {
+      "versao": "0.2.1",
+      "tag": "v0.2.1",
+      "data": "2026-11-24",
+      "nome": "RoadBit",
+      "resumo": "Correções de jogabilidade encontradas em QA: textos que espelham ao rejogar, \"Próxima\" no mesmo marco, Prever sem conclusão automática, foco que não conta erro e 2 dicas por missão.",
+      "jogo": "versoes/v0.2.1/jogo/",
+      "apresentacao": "versoes/v0.2/apresentacao/RoadBit-v0.2-recurso-educacional.pptx",
+      "docs": [
+        {
+          "titulo": "Trilha de aprendizagem",
+          "url": "versoes/v0.2/docs/trilha-de-aprendizagem.html"
+        },
+        {
+          "titulo": "Game Design Document",
+          "url": "versoes/v0.2/docs/GDD.html"
+        },
+        {
+          "titulo": "Esboço da atividade (5W2H)",
+          "url": "versoes/v0.2/docs/esboco-5W2H.html"
+        },
+        {
+          "titulo": "Relatório de novidade",
+          "url": "versoes/v0.2/docs/relatorio-novidade.html"
+        }
+      ],
+      "commit": "d1d4bac"
+    },
     {
       "versao": "0.2",
       "tag": "v0.2.0",

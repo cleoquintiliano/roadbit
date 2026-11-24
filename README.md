@@ -8,6 +8,7 @@ O estudante conduz um robô mensageiro pela cidade lendo um código: executa cad
 |---|---|
 | Página do projeto (todas as versões) | https://cleoquintiliano.github.io/roadbit/ |
 | Jogo, versão mais recente | https://cleoquintiliano.github.io/roadbit/jogo/ |
+| Jogo v0.2.1 | https://cleoquintiliano.github.io/roadbit/versoes/v0.2.1/jogo/ |
 | Jogo v0.2 | https://cleoquintiliano.github.io/roadbit/versoes/v0.2/jogo/ |
 | Jogo v0.1 (demonstração, O Mensageiro) | https://cleoquintiliano.github.io/roadbit/versoes/v0.1/jogo/ |
 | Apresentação do recurso para professores (v0.2, .pptx) | https://cleoquintiliano.github.io/roadbit/versoes/v0.2/apresentacao/RoadBit-v0.2-recurso-educacional.pptx |
@@ -31,7 +32,7 @@ O estudante conduz um robô mensageiro pela cidade lendo um código: executa cad
 - **Quatro modos:** Rastrear, Prever, Depurar e Explicar, mais a reprodução passo a passo ao fim da missão.
 - **Visualização da execução:** foco que passa linha a linha, contador de voltas dos laços, resposta das condições, caminho percorrido, quadro de variáveis e teste de mesa.
 - **Tudo visível sem rolagem nem zoom**, do celular ao monitor.
-- **Erro em camadas, sem punição**, dicas gratuitas e estrelas.
+- **Erro em camadas, sem punição**, 2 dicas por missão e estrelas.
 - **Progresso** salvo no aparelho e num código de progresso. Nenhum dado pessoal é coletado.
 - **Acessibilidade:** condições por forma e cor (● ▲ ■), uso completo pelo teclado e respeito à preferência de reduzir movimento.
 
@@ -41,16 +42,18 @@ O estudante conduz um robô mensageiro pela cidade lendo um código: executa cad
 index.html                  página inicial com todas as versões (gerada de versoes.json)
 versoes.json                lista das versões do jogo e da documentação
 jogo/index.html             versão mais recente do jogo (arquivo único, funciona sem internet)
+versoes/v0.2.1/             jogo da v0.2.1 (correções)
 versoes/v0.2/               jogo e documentos da v0.2
 versoes/v0.1/               jogo, apresentação e documentos da v0.1 (O Mensageiro)
 docs/                       documentação em desenvolvimento
 src/engine.js               motor: árvore sintática, tradutor e interpretador
 src/missoes.js              trilha: marcos, cartões de conceito e missões
 src/app.html                interface do jogo
-src/build.js                junta tudo em versoes/v0.2/jogo/ e jogo/
+src/build.js                junta tudo em versoes/v<versão>/jogo/ e jogo/
 src/landing.js              gera index.html a partir de versoes.json
 src/test.js                 confere todas as missões
 testes/interface.py         confere a interface em cinco tamanhos de tela (Playwright)
+testes/regressao.py         confere as correções da v0.2.1 (Playwright)
 CHANGELOG.md                histórico de mudanças
 ```
 
@@ -60,9 +63,10 @@ Basta abrir `jogo/index.html` no navegador. Para alterar o jogo:
 
 ```bash
 node src/test.js            # confere se todas as missões têm solução
-node src/build.js           # gera o arquivo único do jogo
+node src/build.js           # gera o arquivo único do jogo (versão atual de versoes.json)
 node src/landing.js         # atualiza a página inicial a partir de versoes.json
 python3 testes/interface.py # confere a interface (requer Playwright e Chrome)
+python3 testes/regressao.py # confere as correções de jogabilidade
 ```
 
 ## Fundamentação
