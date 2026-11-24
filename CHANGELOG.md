@@ -2,6 +2,22 @@
 
 Todas as mudanças relevantes do RoadBit ficam registradas aqui. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Cada versão publicada continua disponível em `versoes/vX.Y/` ou `versoes/vX.Y.Z/` no GitHub Pages.
 
+## [0.3.0] - 2026-11-24
+
+A coleção para professores prometida para a MEC RED e o tour guiado no jogo. Disponível em `versoes/v0.3.0/`.
+
+### Adicionado
+- Tour guiado: na primeira visita, o jogo apresenta o mapa, a tela da missão e cada modo. Pode ser pulado (botão ou Esc) e reaberto em "Como jogar", na tela inicial, no mapa e no cartão de conceito. Na primeira missão, a ordem é tour, cartão de conceito e foco.
+- Guia do professor e planos de aula (percurso completo de 15 aulas e curto de 8 aulas), em Markdown e PDF.
+- Pré e pós-teste para impressão: formas A e B isomórficas, com 24 questões (duas por marco principal), gabarito com quadro de especificação, fichas de saída por marco e planilha do ganho normalizado. Cada questão é executada pelo motor do jogo para conferir o gabarito antes de gerar as folhas.
+- Vídeo de demonstração (cerca de 80 s), gravado a partir do próprio jogo por um script.
+- Página inicial com a seção "Coleção para professores (MEC RED)" e o vídeo.
+
+### Alterado
+- O "Esboço da atividade gamificada (5W2H)" passa a se chamar "Proposta pedagógica e gamificação" e foi reescrito para professores e pesquisadores. As partes técnicas foram para o GDD, e a menção direta ao Compute It foi retirada.
+- GDD atualizado com as dicas por missão, o novo Prever, o tour e o pré e pós-teste digital previsto.
+- Forma de citação atualizada para a versão 0.3.0.
+
 ## [0.2.1] - 2026-11-24
 
 Versão de correção, a partir de um QA (teste de qualidade) da v0.2 jogando como estudante. Disponível em `versoes/v0.2.1/`.
@@ -67,6 +83,7 @@ Versão de demonstração, ainda com o nome **O Mensageiro**. Disponível em `ve
 - Código de progresso `M1-…` e progresso salvo no aparelho.
 - Apresentação com animações, GDD, esboço 5W2H e relatório de novidade.
 
+[0.3.0]: https://github.com/cleoquintiliano/roadbit/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/cleoquintiliano/roadbit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/cleoquintiliano/roadbit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cleoquintiliano/roadbit/releases/tag/v0.1.0

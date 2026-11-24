@@ -1,0 +1,342 @@
+{
+ "A": [
+  {
+   "n": 1,
+   "marco": 1,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 2,
+   "marco": 1,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "D"
+  },
+  {
+   "n": 3,
+   "marco": 2,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 4,
+   "marco": 2,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "A"
+  },
+  {
+   "n": 5,
+   "marco": 3,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "D"
+  },
+  {
+   "n": 6,
+   "marco": 3,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "A"
+  },
+  {
+   "n": 7,
+   "marco": 4,
+   "tipo": "prever",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 8,
+   "marco": 4,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 9,
+   "marco": 5,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO01, EF06CO05",
+   "resposta": "B"
+  },
+  {
+   "n": 10,
+   "marco": 5,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO01, EF06CO05",
+   "resposta": "A"
+  },
+  {
+   "n": 11,
+   "marco": 6,
+   "tipo": "prever",
+   "habilidade": "EF06CO03",
+   "resposta": "D"
+  },
+  {
+   "n": 12,
+   "marco": 6,
+   "tipo": "explicar",
+   "habilidade": "EF06CO03",
+   "resposta": "B"
+  },
+  {
+   "n": 13,
+   "marco": 7,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "D"
+  },
+  {
+   "n": 14,
+   "marco": 7,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "A"
+  },
+  {
+   "n": 15,
+   "marco": 8,
+   "tipo": "prever",
+   "habilidade": "EF06CO02",
+   "resposta": "D"
+  },
+  {
+   "n": 16,
+   "marco": 8,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "D"
+  },
+  {
+   "n": 17,
+   "marco": 9,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO04, EF07CO05",
+   "resposta": "C"
+  },
+  {
+   "n": 18,
+   "marco": 9,
+   "tipo": "explicar",
+   "habilidade": "EF06CO04, EF07CO05",
+   "resposta": "B"
+  },
+  {
+   "n": 19,
+   "marco": 10,
+   "tipo": "prever",
+   "habilidade": "EF06CO06",
+   "resposta": "D"
+  },
+  {
+   "n": 20,
+   "marco": 10,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO06)",
+   "resposta": "A"
+  },
+  {
+   "n": 21,
+   "marco": 11,
+   "tipo": "rastrear",
+   "habilidade": "EF07CO01, EF08CO02",
+   "resposta": "A"
+  },
+  {
+   "n": 22,
+   "marco": 11,
+   "tipo": "rastrear",
+   "habilidade": "EF07CO01, EF08CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 23,
+   "marco": 12,
+   "tipo": "explicar",
+   "habilidade": "EF08CO03",
+   "resposta": "C"
+  },
+  {
+   "n": 24,
+   "marco": 12,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF08CO03)",
+   "resposta": "C"
+  }
+ ],
+ "B": [
+  {
+   "n": 1,
+   "marco": 1,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 2,
+   "marco": 1,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "B"
+  },
+  {
+   "n": 3,
+   "marco": 2,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 4,
+   "marco": 2,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 5,
+   "marco": 3,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 6,
+   "marco": 3,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "D"
+  },
+  {
+   "n": 7,
+   "marco": 4,
+   "tipo": "prever",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 8,
+   "marco": 4,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 9,
+   "marco": 5,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO01, EF06CO05",
+   "resposta": "D"
+  },
+  {
+   "n": 10,
+   "marco": 5,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO01, EF06CO05",
+   "resposta": "D"
+  },
+  {
+   "n": 11,
+   "marco": 6,
+   "tipo": "prever",
+   "habilidade": "EF06CO03",
+   "resposta": "D"
+  },
+  {
+   "n": 12,
+   "marco": 6,
+   "tipo": "explicar",
+   "habilidade": "EF06CO03",
+   "resposta": "A"
+  },
+  {
+   "n": 13,
+   "marco": 7,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO02",
+   "resposta": "B"
+  },
+  {
+   "n": 14,
+   "marco": 7,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO02)",
+   "resposta": "A"
+  },
+  {
+   "n": 15,
+   "marco": 8,
+   "tipo": "prever",
+   "habilidade": "EF06CO02",
+   "resposta": "D"
+  },
+  {
+   "n": 16,
+   "marco": 8,
+   "tipo": "explicar",
+   "habilidade": "EF06CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 17,
+   "marco": 9,
+   "tipo": "rastrear",
+   "habilidade": "EF06CO04, EF07CO05",
+   "resposta": "A"
+  },
+  {
+   "n": 18,
+   "marco": 9,
+   "tipo": "explicar",
+   "habilidade": "EF06CO04, EF07CO05",
+   "resposta": "C"
+  },
+  {
+   "n": 19,
+   "marco": 10,
+   "tipo": "prever",
+   "habilidade": "EF06CO06",
+   "resposta": "D"
+  },
+  {
+   "n": 20,
+   "marco": 10,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF06CO06)",
+   "resposta": "A"
+  },
+  {
+   "n": 21,
+   "marco": 11,
+   "tipo": "rastrear",
+   "habilidade": "EF07CO01, EF08CO02",
+   "resposta": "A"
+  },
+  {
+   "n": 22,
+   "marco": 11,
+   "tipo": "rastrear",
+   "habilidade": "EF07CO01, EF08CO02",
+   "resposta": "C"
+  },
+  {
+   "n": 23,
+   "marco": 12,
+   "tipo": "explicar",
+   "habilidade": "EF08CO03",
+   "resposta": "A"
+  },
+  {
+   "n": 24,
+   "marco": 12,
+   "tipo": "depurar",
+   "habilidade": "EF07CO02 (com EF08CO03)",
+   "resposta": "D"
+  }
+ ]
+}

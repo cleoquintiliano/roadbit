@@ -1,7 +1,83 @@
 {
   "projeto": "RoadBit",
-  "atual": "0.2.1",
+  "atual": "0.3.0",
   "versoes": [
+    {
+      "versao": "0.3.0",
+      "tag": "v0.3.0",
+      "data": "2026-11-24",
+      "nome": "RoadBit",
+      "resumo": "Tour guiado no jogo e a coleção para professores: guia do professor, planos de aula, pré e pós-teste para impressão e vídeo de demonstração.",
+      "jogo": "versoes/v0.3.0/jogo/",
+      "colecao": [
+        {
+          "titulo": "Jogo",
+          "desc": "No navegador do computador ou do celular, sem instalação e sem cadastro.",
+          "url": "jogo/",
+          "acao": "Jogar"
+        },
+        {
+          "titulo": "Guia do professor",
+          "desc": "Preparação, condução da aula, como ajudar quem trava, erros comuns por marco e acessibilidade.",
+          "url": "versoes/v0.3.0/docs/guia-do-professor.pdf",
+          "acao": "Baixar o PDF"
+        },
+        {
+          "titulo": "Planos de aula",
+          "desc": "Percurso completo (15 aulas) e curto (8 aulas), com o roteiro de cada aula.",
+          "url": "versoes/v0.3.0/docs/planos-de-aula.pdf",
+          "acao": "Baixar o PDF"
+        },
+        {
+          "titulo": "Pré e pós-teste",
+          "desc": "Formas A e B para imprimir, gabarito, fichas de saída por marco e planilha do ganho da turma.",
+          "url": "versoes/v0.3.0/docs/avaliacao/",
+          "acao": "Ver os materiais"
+        },
+        {
+          "titulo": "Vídeo de demonstração",
+          "desc": "O jogo em cerca de 80 segundos: tour, os quatro modos e o mapa.",
+          "url": "versoes/v0.3.0/video/roadbit-demonstracao.mp4",
+          "poster": "versoes/v0.3.0/video/roadbit-demonstracao.png",
+          "video": true
+        }
+      ],
+      "docs": [
+        {
+          "titulo": "Guia do professor",
+          "url": "versoes/v0.3.0/docs/guia-do-professor.html"
+        },
+        {
+          "titulo": "Planos de aula",
+          "url": "versoes/v0.3.0/docs/planos-de-aula.html"
+        },
+        {
+          "titulo": "Pré e pós-teste",
+          "url": "versoes/v0.3.0/docs/avaliacao/"
+        },
+        {
+          "titulo": "Proposta pedagógica e gamificação (5W2H)",
+          "url": "versoes/v0.3.0/docs/proposta-pedagogica.html"
+        },
+        {
+          "titulo": "Trilha de aprendizagem",
+          "url": "versoes/v0.3.0/docs/trilha-de-aprendizagem.html"
+        },
+        {
+          "titulo": "Game Design Document",
+          "url": "versoes/v0.3.0/docs/GDD.html"
+        },
+        {
+          "titulo": "Relatório de novidade",
+          "url": "versoes/v0.3.0/docs/relatorio-novidade.html"
+        },
+        {
+          "titulo": "Vídeo de demonstração",
+          "url": "versoes/v0.3.0/video/roadbit-demonstracao.mp4"
+        }
+      ],
+      "commit": "61df61a"
+    },
     {
       "versao": "0.2.1",
       "tag": "v0.2.1",

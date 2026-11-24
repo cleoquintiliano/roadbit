@@ -17,6 +17,7 @@
   h1{font-size:clamp(44px,8vw,76px);line-height:1.02;margin:8px 0 14px;letter-spacing:-1px}
   h1 span{color:var(--teal)}
   h2{font-size:24px;margin:44px 0 14px}
+  .sub{color:var(--ink2);margin:-6px 0 14px}
   .lead{font-size:20px;color:var(--ink2);max-width:680px;margin:0 0 30px}
   .hero{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#fff;background:var(--blue);border-radius:24px;padding:26px 28px;max-width:640px}
   .hero b{font-size:26px}
@@ -27,6 +28,13 @@
   a.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px}
   a.card:hover,a.card:focus-visible{border-color:var(--teal);outline:none}
   a.card b{font-size:18px}
+  a.card span{color:var(--ink2);font-size:15px}
+  a.card span.go{color:var(--teal-d);font-size:16px}
+  figure.video{grid-column:1/-1;margin:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  figure.video video{display:block;width:100%;aspect-ratio:16/9;background:#1F2A44}
+  figure.video figcaption{padding:12px 18px;color:var(--ink2)}
+  figure.video figcaption b{color:var(--ink)}
+  figure.video a{color:var(--blue);font-weight:700}
   .go{font-weight:700;color:var(--teal-d);margin-top:auto}
   .ver{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 22px;margin-bottom:14px}
   .ver.cur{border-color:#BFE7E6}
@@ -49,23 +57,53 @@
   <p class="lead">Um jogo em que o estudante faz o papel do computador: executa o código linha a linha, prevê o resultado, explica o que ele faz e conserta erros para levar um robô mensageiro pela cidade.</p>
 
   <a class="hero" href="jogo/">
-    <b>Jogar a versão 0.2.1</b>
-    <p>Correções de jogabilidade encontradas em QA: textos que espelham ao rejogar, &quot;Próxima&quot; no mesmo marco, Prever sem conclusão automática, foco que não conta erro e 2 dicas por missão. Funciona no computador e no celular, sem instalação.</p>
+    <b>Jogar a versão 0.3.0</b>
+    <p>Tour guiado no jogo e a coleção para professores: guia do professor, planos de aula, pré e pós-teste para impressão e vídeo de demonstração. Funciona no computador e no celular, sem instalação.</p>
     <span>Abrir o jogo →</span>
   </a>
 
+  <h2>Coleção para professores (MEC RED)</h2>
+  <p class="sub">Tudo o que é preciso para aplicar o RoadBit em sala, sem a presença do autor.</p>
+  <div class="cards">
+      <a class="card" href="jogo/"><b>Jogo</b><span>No navegador do computador ou do celular, sem instalação e sem cadastro.</span><span class="go">Jogar →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/guia-do-professor.pdf"><b>Guia do professor</b><span>Preparação, condução da aula, como ajudar quem trava, erros comuns por marco e acessibilidade.</span><span class="go">Baixar o PDF →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/planos-de-aula.pdf"><b>Planos de aula</b><span>Percurso completo (15 aulas) e curto (8 aulas), com o roteiro de cada aula.</span><span class="go">Baixar o PDF →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/avaliacao/"><b>Pré e pós-teste</b><span>Formas A e B para imprimir, gabarito, fichas de saída por marco e planilha do ganho da turma.</span><span class="go">Ver os materiais →</span></a>
+      <figure class="video"><video controls preload="none" poster="versoes/v0.3.0/video/roadbit-demonstracao.png" src="versoes/v0.3.0/video/roadbit-demonstracao.mp4"></video><figcaption><b>Vídeo de demonstração</b> O jogo em cerca de 80 segundos: tour, os quatro modos e o mapa. <a href="versoes/v0.3.0/video/roadbit-demonstracao.mp4" download>Baixar o vídeo</a></figcaption></figure>
+  </div>
+
   <h2>Documentação da versão atual</h2>
   <div class="cards">
-      <a class="card" href="versoes/v0.2/docs/trilha-de-aprendizagem.html"><b>Trilha de aprendizagem</b><span class="go">Ler →</span></a>
-      <a class="card" href="versoes/v0.2/docs/GDD.html"><b>Game Design Document</b><span class="go">Ler →</span></a>
-      <a class="card" href="versoes/v0.2/docs/esboco-5W2H.html"><b>Esboço da atividade (5W2H)</b><span class="go">Ler →</span></a>
-      <a class="card" href="versoes/v0.2/docs/relatorio-novidade.html"><b>Relatório de novidade</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/guia-do-professor.html"><b>Guia do professor</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/planos-de-aula.html"><b>Planos de aula</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/avaliacao/"><b>Pré e pós-teste</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/proposta-pedagogica.html"><b>Proposta pedagógica e gamificação (5W2H)</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/trilha-de-aprendizagem.html"><b>Trilha de aprendizagem</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/GDD.html"><b>Game Design Document</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/docs/relatorio-novidade.html"><b>Relatório de novidade</b><span class="go">Ler →</span></a>
+      <a class="card" href="versoes/v0.3.0/video/roadbit-demonstracao.mp4"><b>Vídeo de demonstração</b><span class="go">Ler →</span></a>
   </div>
 
   <h2>Todas as versões</h2>
   <section>
       <article class="ver cur">
-        <header><b>v0.2.1</b><span>RoadBit · 24/11/2026</span><em>atual</em></header>
+        <header><b>v0.3.0</b><span>RoadBit · 24/11/2026</span><em>atual</em></header>
+        <p>Tour guiado no jogo e a coleção para professores: guia do professor, planos de aula, pré e pós-teste para impressão e vídeo de demonstração.</p>
+        <nav>
+          <a href="versoes/v0.3.0/jogo/">Jogo</a>
+          <a href="versoes/v0.3.0/docs/guia-do-professor.html">Guia do professor</a>
+          <a href="versoes/v0.3.0/docs/planos-de-aula.html">Planos de aula</a>
+          <a href="versoes/v0.3.0/docs/avaliacao/">Pré e pós-teste</a>
+          <a href="versoes/v0.3.0/docs/proposta-pedagogica.html">Proposta pedagógica e gamificação (5W2H)</a>
+          <a href="versoes/v0.3.0/docs/trilha-de-aprendizagem.html">Trilha de aprendizagem</a>
+          <a href="versoes/v0.3.0/docs/GDD.html">Game Design Document</a>
+          <a href="versoes/v0.3.0/docs/relatorio-novidade.html">Relatório de novidade</a>
+          <a href="versoes/v0.3.0/video/roadbit-demonstracao.mp4">Vídeo de demonstração</a>
+          <a href="https://github.com/cleoquintiliano/roadbit/tree/61df61a">Código (v0.3.0)</a>
+        </nav>
+      </article>
+      <article class="ver">
+        <header><b>v0.2.1</b><span>RoadBit · 24/11/2026</span></header>
         <p>Correções de jogabilidade encontradas em QA: textos que espelham ao rejogar, &quot;Próxima&quot; no mesmo marco, Prever sem conclusão automática, foco que não conta erro e 2 dicas por missão.</p>
         <nav>
           <a href="versoes/v0.2.1/jogo/">Jogo</a>
@@ -106,7 +144,7 @@
 
   <p class="meta">O endereço <a href="jogo/">jogo/</a> abre sempre a versão mais recente. Histórico de mudanças no <a href="https://github.com/cleoquintiliano/roadbit/blob/main/CHANGELOG.md">CHANGELOG</a> · Código no <a href="https://github.com/cleoquintiliano/roadbit">GitHub</a>.<br>
   Autor: Cléo Quintiliano Fernandes de Brito · Mestrado Profissional em Ensino de Computação (ProfComp/UENP), 2026.<br>
-  Código sob licença MIT; textos e apresentação sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
+  Código sob licença MIT; textos, guia, planos de aula, avaliação, vídeo e apresentação sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
 </main>
 </body>
 </html>

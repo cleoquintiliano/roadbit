@@ -7,6 +7,10 @@ const V = JSON.parse(fs.readFileSync(path.join(raiz, 'versoes.json'), 'utf8'));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const data = d => d.split('-').reverse().join('/');
 const atual = V.versoes.find(v => v.versao === V.atual);
+// coleção publicada na MEC RED (itens da versão atual, quando houver)
+const colecao = (atual.colecao || []).map(c => c.video
+  ? '<figure class="video"><video controls preload="none" poster="' + c.poster + '" src="' + c.url + '"></video><figcaption><b>' + esc(c.titulo) + '</b> ' + esc(c.desc) + ' <a href="' + c.url + '" download>Baixar o vídeo</a></figcaption></figure>'
+  : '<a class="card" href="' + c.url + '"><b>' + esc(c.titulo) + '</b><span>' + esc(c.desc) + '</span><span class="go">' + esc(c.acao || 'Abrir') + ' →</span></a>').join('\n      ');
 const docsAtuais = atual.docs.map(d => '<a class="card" href="' + d.url + '"><b>' + esc(d.titulo) + '</b><span class="go">Ler →</span></a>').join('\n      ');
 const linhas = V.versoes.map(v => `
       <article class="ver${v.versao === V.atual ? ' cur' : ''}">
@@ -37,6 +41,7 @@ const html = `<!DOCTYPE html>
   h1{font-size:clamp(44px,8vw,76px);line-height:1.02;margin:8px 0 14px;letter-spacing:-1px}
   h1 span{color:var(--teal)}
   h2{font-size:24px;margin:44px 0 14px}
+  .sub{color:var(--ink2);margin:-6px 0 14px}
   .lead{font-size:20px;color:var(--ink2);max-width:680px;margin:0 0 30px}
   .hero{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:#fff;background:var(--blue);border-radius:24px;padding:26px 28px;max-width:640px}
   .hero b{font-size:26px}
@@ -47,6 +52,13 @@ const html = `<!DOCTYPE html>
   a.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px}
   a.card:hover,a.card:focus-visible{border-color:var(--teal);outline:none}
   a.card b{font-size:18px}
+  a.card span{color:var(--ink2);font-size:15px}
+  a.card span.go{color:var(--teal-d);font-size:16px}
+  figure.video{grid-column:1/-1;margin:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  figure.video video{display:block;width:100%;aspect-ratio:16/9;background:#1F2A44}
+  figure.video figcaption{padding:12px 18px;color:var(--ink2)}
+  figure.video figcaption b{color:var(--ink)}
+  figure.video a{color:var(--blue);font-weight:700}
   .go{font-weight:700;color:var(--teal-d);margin-top:auto}
   .ver{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 22px;margin-bottom:14px}
   .ver.cur{border-color:#BFE7E6}
@@ -74,6 +86,12 @@ const html = `<!DOCTYPE html>
     <span>Abrir o jogo →</span>
   </a>
 
+  ${colecao ? `<h2>Coleção para professores (MEC RED)</h2>
+  <p class="sub">Tudo o que é preciso para aplicar o RoadBit em sala, sem a presença do autor.</p>
+  <div class="cards">
+      ${colecao}
+  </div>
+` : ''}
   <h2>Documentação da versão atual</h2>
   <div class="cards">
       ${docsAtuais}
@@ -85,7 +103,7 @@ const html = `<!DOCTYPE html>
 
   <p class="meta">O endereço <a href="jogo/">jogo/</a> abre sempre a versão mais recente. Histórico de mudanças no <a href="https://github.com/cleoquintiliano/roadbit/blob/main/CHANGELOG.md">CHANGELOG</a> · Código no <a href="https://github.com/cleoquintiliano/roadbit">GitHub</a>.<br>
   Autor: Cléo Quintiliano Fernandes de Brito · Mestrado Profissional em Ensino de Computação (ProfComp/UENP), 2026.<br>
-  Código sob licença MIT; textos e apresentação sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
+  Código sob licença MIT; textos, guia, planos de aula, avaliação, vídeo e apresentação sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
 </main>
 </body>
 </html>
