@@ -54,7 +54,7 @@ Hattie e Timperley (2007) mostram que o retorno é mais útil quando diz onde o 
 
 ### 2.6 Jogo e motivação
 
-A aprendizagem baseada em jogos combina fundamentos cognitivos, motivacionais, afetivos e socioculturais (PLASS; HOMER; KINZER, 2015). Na perspectiva da Teoria da Autodeterminação (RYAN; DECI, 2000), o RoadBit busca apoiar **competência** (desafio graduado, estrelas, reforço), **autonomia** (escolha da missão dentro do marco, rejogar, ligar ou desligar o foco) e propósito narrativo (acender as casas da cidade). O planejamento da gamificação segue o Framework 5W2H (KLOCK; GASPARINI; PIMENTA, 2016) e a taxonomia de elementos de Toda et al. (2019), detalhados no esboço da atividade.
+A aprendizagem baseada em jogos combina fundamentos cognitivos, motivacionais, afetivos e socioculturais (PLASS; HOMER; KINZER, 2015). Na perspectiva da Teoria da Autodeterminação (RYAN; DECI, 2000), o RoadBit busca apoiar **competência** (desafio graduado, estrelas, reforço), **autonomia** (escolha da missão dentro do marco, rejogar, ligar ou desligar o foco) e propósito narrativo (acender as casas da cidade). O planejamento da gamificação segue o Framework 5W2H (KLOCK; GASPARINI; PIMENTA, 2016) e a taxonomia de elementos de Toda et al. (2019), detalhados na [proposta pedagógica](proposta-pedagogica.md).
 
 ## 3. Os 16 marcos
 

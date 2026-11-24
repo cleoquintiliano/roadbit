@@ -1,6 +1,6 @@
 # RoadBit: Game Design Document (GDD)
 
-Versão 0.2 · 2026-11-17 · Cléo Quintiliano Fernandes de Brito
+Versão 0.3 · 2026-11-24 · Cléo Quintiliano Fernandes de Brito
 
 > O jogo se chamava **O Mensageiro** até a v0.1. A partir da v0.2 o produto se chama **RoadBit**; o mensageiro continua sendo o personagem. O histórico de mudanças está no [CHANGELOG](../CHANGELOG.md).
 
@@ -105,7 +105,7 @@ Entrar, abrir o marco atual no mapa, ler o cartão de conceito, avançar pelas m
 **Por que vale a pena.**
 
 - **A progressão vira parte da história.** Neste jogo, o mapa é o próprio mundo. As casas acesas nas missões continuam acesas no mapa, e a cidade se ilumina diante do estudante. Isso mostra os valores sem dizer nada.
-- **Atende ao elemento Progressão** da dimensão de desempenho da taxonomia de Toda et al. (2019), já previsto no esboço, de forma muito mais visível que uma lista.
+- **Atende ao elemento Progressão** da dimensão de desempenho da taxonomia de Toda et al. (2019), já previsto na proposta pedagógica, de forma muito mais visível que uma lista.
 - **Apoia competência e autonomia**, duas das necessidades psicológicas básicas da Teoria da Autodeterminação (Ryan; Deci, 2000): o estudante vê quanto já percorreu e pode escolher caminhos opcionais.
 - **Orienta o professor.** Numa olhada, ele vê em que bairro cada estudante está.
 
@@ -179,7 +179,7 @@ Os códigos da BNCC devem ser conferidos no anexo oficial antes da publicação 
 
 O estudante continua do ponto do erro, nunca do zero.
 
-**Dicas.** Três dicas gratuitas por marco, sem moedas e sem compra. A dica é um andaime que o estudante decide quando usar.
+**Dicas.** Duas dicas gratuitas por missão, renovadas a cada missão, sem moedas e sem compra (até a v0.2 eram 3 por marco, que acabavam logo no início do marco). A dica é um andaime que o estudante decide quando usar, e conta como um erro nas estrelas. No Rastrear, ela explica o passo; no Depurar, marca a linha do erro; no Explicar, risca uma frase errada; no Prever, o computador executa a primeira metade do programa e o estudante continua dali.
 
 **Estrelas.** De 1 a 3 por missão: 3 sem erro e sem dica; 2 com até dois erros ou dicas; 1 nos demais casos. No Prever, no Depurar e no Explicar, as estrelas dependem do número de tentativas. Aparecem só no mapa e na tela de fim de missão, nunca durante o jogo.
 
@@ -189,7 +189,11 @@ O estudante continua do ponto do erro, nunca do zero.
 
 **Explicar.** Uma frase errada escolhida fica riscada e o estudante pode ver o código executar antes de tentar de novo; a dica risca uma frase errada.
 
-**Prever.** Ao conferir, a execução é mostrada passo a passo, com o caminho marcado. Se o mensageiro parar em outro lugar, ou se o valor previsto da variável estiver errado, uma frase curta diz qual dos dois falhou e o estudante prevê de novo.
+**Prever.** Ao conferir, a execução é mostrada passo a passo, com o caminho marcado. Se o mensageiro parar em outro lugar, ou se o valor previsto da variável estiver errado, uma frase curta diz qual dos dois falhou. O caminho fica na tela até o estudante tocar em "Tentar de novo". Depois do 3º erro, a resposta aparece marcada em verde e o estudante precisa tocar nela (ou ajustar o valor) para concluir com 1 estrela: a missão nunca termina sem que ele veja e confirme a resposta.
+
+**Foco.** A primeira tecla apertada durante o foco só pula a animação e não conta como resposta.
+
+**Tour guiado (v0.3).** Na primeira visita, um tour curto aponta cada parte da tela e explica para que ela serve: no mapa (Jogar, marcos, progresso e código de progresso), na missão (código, mapa, controles, orientações, dicas, conceito e foco) e na primeira missão de cada modo (Prever, Depurar e Explicar). Na primeira missão, a ordem é tour, cartão de conceito e foco. O tour pode ser pulado pelo botão ou por Esc e reaberto em "Como jogar", na tela inicial, no mapa e no cartão de conceito.
 
 ## 7. Gamificação
 
@@ -208,7 +212,7 @@ Os elementos seguem a Taxonomia de Toda et al. (2019), dentro da dimensão "Como
 
 **Evitados de propósito.**
 
-- **Moedas e loja:** substituídas por 3 dicas gratuitas por marco, para não criar uma economia que compete com o desafio.
+- **Moedas e loja:** substituídas por 2 dicas gratuitas por missão, para não criar uma economia que compete com o desafio.
 - **Ranking público:** expõe quem está atrás, o que desmotiva sobretudo estudantes de territórios vulneráveis.
 - **Pressão de tempo:** rastrear exige atenção, não pressa. Só em missões bônus opcionais.
 - **Frases morais na tela:** adolescentes rejeitam sermão; os valores ficam na história.
@@ -312,6 +316,10 @@ Os elementos seguem a Taxonomia de Toda et al. (2019), dentro da dimensão "Como
 | Progresso | localStorage e código de progresso |
 | Qualidade | Teste automático das 192 missões, inclusive espelhadas, e teste de interface com Playwright em cinco tamanhos de tela |
 
+**Painel do professor (previsto).** Criação da turma, mapa de calor dos conceitos com mais erros e dicas, liberação de marcos e exportação dos resultados.
+
+**Pré e pós-teste dentro do jogo (previsto).** As questões das formas A e B (docs/avaliacao) entram no jogo como um modo próprio, sem estrelas e sem dicas, com registro das respostas por questão. O professor abre o teste da turma e recebe o ganho normalizado. Cada questão já tem identificador, marco, habilidade da BNCC e tipo (rastrear, explicar ou depurar), o que permite levá-las para o jogo sem reescrever.
+
 **Versão completa (prevista).**
 
 | Camada | Tecnologia |
@@ -349,7 +357,7 @@ Os elementos seguem a Taxonomia de Toda et al. (2019), dentro da dimensão "Como
 | Progresso | Aparelho e código M1 | Aparelho e código RB2 | Servidor, e-mail institucional ou apelido |
 | Linguagens | Pseudocódigo com símbolos | Pseudocódigo com símbolos | Blocos, Python e JavaScript |
 | Idioma | Português | Português (código preparado para tradução) | Inglês e espanhol |
-| Professor | Guia e plano de aulas | Parâmetro ?tudo para abrir todas as missões | Painel da turma |
+| Professor | Guia e plano de aulas | Parâmetro ?tudo; na v0.3, guia do professor, planos de aula, pré e pós-teste impressos e tour guiado | Painel da turma e pré e pós-teste dentro do jogo |
 
 **Cronograma.**
 
@@ -359,6 +367,7 @@ Os elementos seguem a Taxonomia de Toda et al. (2019), dentro da dimensão "Como
 | 17/11/2026 | v0.2 publicada: trilha completa e mapa único |
 | Até 20/11 | Teste de jogo com turma, guia do professor e plano de aulas |
 | 23/11/2026 | Coleção na MEC RED e envio por e-mail ao professor da disciplina |
+| 24/11/2026 | v0.2.1 (correções do QA) e v0.3.0 (tour guiado, guia do professor, planos de aula, pré e pós-teste e vídeo) |
 
 ## 13. Riscos e decisões em aberto
 
@@ -403,4 +412,4 @@ TODA, A. M. et al. Analysing gamification elements in educational environments u
 
 TOXICODE. **Compute It**. Jogo digital. Disponível em: https://compute-it.toxicode.fr/. Acesso em: 5 nov. 2026.
 
-Documentos relacionados: trilha de aprendizagem, esboço da atividade (5W2H), relatório de novidade e diferenciação e apresentação de 06/11/2026 (v0.1).
+Documentos relacionados: trilha de aprendizagem, proposta pedagógica e gamificação (5W2H), guia do professor, planos de aula, pré e pós-teste, relatório de novidade e diferenciação e apresentação de 06/11/2026 (v0.1).

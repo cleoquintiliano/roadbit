@@ -2,7 +2,7 @@
 
 2026-11-05, nomes atualizados em 2026-11-17 · Cléo Quintiliano Fernandes de Brito
 
-> Relatório escrito quando o jogo se chamava O Mensageiro (v0.1). A busca e a análise são de 05/11/2026; nesta revisão, só o nome foi atualizado. O que a v0.2 acrescenta (trilha completa, modo Explicar e visualização da execução) está na [trilha de aprendizagem](trilha-de-aprendizagem.md) e no [esboço 5W2H](esboco-5W2H.md#roadbit-e-as-ferramentas-do-mesmo-escopo).
+> Relatório escrito quando o jogo se chamava O Mensageiro (v0.1). A busca e a análise são de 05/11/2026; nesta revisão, só o nome foi atualizado. O que a v0.2 acrescenta (trilha completa, modo Explicar e visualização da execução) está na [trilha de aprendizagem](trilha-de-aprendizagem.md) e no [proposta pedagógica](proposta-pedagogica.md#o-roadbit-entre-as-ferramentas-do-mesmo-escopo).
 
 ## Resposta curta
 
