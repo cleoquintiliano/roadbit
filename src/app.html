@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="RoadBit: jogo de leitura de código para o Pensamento Computacional da BNCC Computação.">
-<title>RoadBit v0.2</title>
+<title>RoadBit v/*VERSAO*/</title>
 <style>
 /*FONTS*/
 :root{
@@ -117,7 +117,7 @@ h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.4px}
 .top{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--white);border-bottom:1px solid var(--line);flex:none}
 .top .ttl{flex:1;min-width:0}
 .top .ttl b{display:block;font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.top .ttl span{display:block;font-size:14px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .ttl > span{display:block;font-size:14px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ico{min-width:44px;height:44px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;padding:0 12px;font-size:15px;background:var(--bg);color:var(--ink);white-space:nowrap}
 .ico.on{background:var(--teal-l);color:var(--teal-d)}
 .ico .sm{display:none;font-size:20px}
@@ -125,6 +125,7 @@ h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.4px}
 @media (max-width:600px){.ico .lg{display:none}.ico .sm{display:inline}.top{gap:6px}}
 .chip{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--teal-l);color:var(--teal-d);font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
 .chip.d{background:#FCE4EE;color:var(--kwc)}
+.top .ttl .mmode{display:none;font-weight:700;color:var(--teal-d)}
 .stage{flex:1;min-height:0;display:grid;gap:6px 32px;padding:10px 14px;grid-template-columns:1fr;grid-template-rows:auto 1fr;align-content:start;width:100%;max-width:1360px;margin:0 auto}
 .stage.wide{grid-template-columns:auto 1fr;grid-template-rows:1fr;align-content:center;padding:14px 32px}
 .stage.wide.mesa{grid-template-columns:auto 1fr 250px}
@@ -190,6 +191,7 @@ h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.4px}
 @keyframes pop{40%{transform:scale(1.14) translateY(-4%)}100%{transform:scale(1)}}
 .cell.pick .dot{box-shadow:0 0 0 4px var(--white),0 0 0 8px var(--blue)}
 .cell.wrong .dot{box-shadow:0 0 0 4px var(--white),0 0 0 8px var(--coral)}
+.cell.answer .dot{box-shadow:0 0 0 4px var(--white),0 0 0 8px var(--g)}
 .cell.target .house{animation:nudge 1s ease-in-out 3}
 @keyframes nudge{50%{transform:translateY(-8%)}}
 .robot,.phantom{position:absolute;pointer-events:none;transition:left .17s ease-out,top .17s ease-out,transform .17s ease-out,opacity .2s;z-index:2}
@@ -253,6 +255,7 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
 .pop .pval{color:#C2410C;font-family:var(--mono);font-size:28px;font-weight:700}
 @media (max-width:899px){
   .top .chip{display:none}
+  .top .ttl .mmode{display:inline}
   .top .ttl b{font-size:16px}
   .ico{padding:0 10px}
   .banner{font-size:16px}
@@ -267,7 +270,7 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
 
 <!-- INÍCIO -->
 <section id="home" class="screen on">
-  <div class="eyebrow">Pensamento Computacional · versão 0.2</div>
+  <div class="eyebrow">Pensamento Computacional · versão /*VERSAO*/</div>
   <h1>Road<span>Bit</span></h1>
   <p class="sub">Você é o computador. Leia o código, leve o mensageiro pela cidade e acenda as casas.</p>
   <div class="row">
@@ -297,7 +300,7 @@ input.inp{font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;borde
     <div class="ttl"><b id="mTitle"></b><span id="mSub"></span></div>
     <span class="chip" id="mMode"></span>
     <button class="ico" id="concBtn" aria-label="Ver o conceito deste marco"><span class="lg">Conceito</span><span class="sm">?</span></button>
-    <button class="ico" id="hintBtn" aria-label="Usar uma dica">Dica 3</button>
+    <button class="ico" id="hintBtn" aria-label="Usar uma dica">Dica 2</button>
     <button class="ico" id="sweepBtn" aria-label="Foco passo a passo ligado ou desligado" title="Foco passo a passo"><span class="lg">Foco</span><span class="sm">»</span></button>
     <button class="ico" id="sndBtn" aria-label="Som"><span class="lg" id="sndTxt">Som</span><span class="sm">♪</span></button>
   </div>
@@ -396,7 +399,17 @@ const missoesDo = mid => MISSIONS.filter(m => m.marco === mid);
 const feitas = mid => missoesDo(mid).filter(m => P.stars[m.id]).length;
 const marcoAberto = k => TUDO || k.req === 0 || feitas(k.req) >= 8;
 const missaoAberta = m => TUDO || (marcoAberto(marcoDe(m.marco)) && (m.n === 1 || !!P.stars[m.marco + '-' + (m.n - 1)]));
-const hintsLeft = mid => 3 - (P.hints[mid] || 0);
+const DICAS_POR_MISSAO = 2;
+const hintsLeft = () => DICAS_POR_MISSAO - (G.hintsUsed || 0);
+// depois de uma missão, segue no mesmo marco; só quando ele acaba volta à primeira pendente da trilha
+function proximaDepois(m){
+  if (m) {
+    const ms = missoesDo(m.marco);
+    const adiante = ms.find(q => q.n > m.n && !P.stars[q.id] && missaoAberta(q)) || ms.find(q => !P.stars[q.id] && missaoAberta(q));
+    if (adiante) return adiante;
+  }
+  return proxima();
+}
 function proxima(){
   for (const k of MARCOS) { if (!marcoAberto(k)) continue; const m = missoesDo(k.id).find(q => !P.stars[q.id]); if (m && missaoAberta(m)) return m; }
   return null;
@@ -530,10 +543,12 @@ function openMarco(mid){
     ov('marcoOv', false); P.seen[mid] = 1; save(); openMission(m.id);
   });
 }
-function openConceito(){
+function openConceito(depois){
   const k = marcoDe(G.m.marco);
   $('concCard').innerHTML = '<div class="kick' + (k.bonus ? ' b' : '') + '">' + (k.bonus ? 'Marco bônus' : 'Marco ' + k.id) + ' · ' + esc(k.lugar) + '</div><h2>' + esc(k.objeto) + '</h2>' + conceitoHTML(k) + '<div class="acts"><button class="btn primary" id="ccClose">Voltar à missão</button></div>';
-  ov('concOv', true); $('ccClose').onclick = () => ov('concOv', false);
+  ov('concOv', true);
+  $('ccClose').onclick = () => { ov('concOv', false); if (typeof depois === 'function') depois(); };
+  later(() => $('ccClose').focus(), 50);
 }
 
 // ===================== missão =====================
@@ -559,7 +574,7 @@ function openMission(id){
   G = { m, k, errors: 0, hintsUsed: 0, tries: 0, runs: 0, mode: m.modo, steps: [], idx: 0 };
   show('jogo');
   $('mTitle').textContent = m.id + ' · ' + m.titulo;
-  $('mSub').textContent = (k.bonus ? 'Bônus' : 'Marco ' + k.id) + ' · ' + k.objeto;
+  $('mSub').innerHTML = '<span class="mmode">' + modoCurto(m) + ' · </span>' + esc((k.bonus ? 'Bônus' : 'Marco ' + k.id) + ' · ' + k.objeto);
   $('mMode').textContent = modoCurto(m); $('mMode').className = 'chip' + (m.desafio ? ' d' : '');
   $('sndTxt').textContent = P.mute ? 'Som: não' : 'Som'; $('sndBtn').classList.toggle('mut', P.mute);
   $('sweepBtn').classList.toggle('on', P.sweep);
@@ -568,16 +583,19 @@ function openMission(id){
   G.L = E.layout(G.ast, { editable: m.modo === 'depurar' });
   G.tr = E.simulate(m, G.ast);
   G.steps = G.tr.steps;
+  // sem movimento (só variáveis), o mapa não ajuda a ler: fica escondido
+  G.semMapa = !!m.soVar || !G.steps.some(s => s.kind === 'in');
   buildCode();
   setupMode();
   buildBoard();
   renderState(-1);
   fit();
-  if (!P.seen[m.marco] && !TUDO) { P.seen[m.marco] = 1; save(); openConceito(); }
-  startMode();
+  // na primeira missão do marco, o foco só começa depois que o estudante fecha o cartão de conceito
+  if (!P.seen[m.marco] && !TUDO) { P.seen[m.marco] = 1; save(); openConceito(startMode); }
+  else startMode();
 }
 
-function updHint(){ const n = hintsLeft(G.m.marco); $('hintBtn').textContent = 'Dica ' + n; $('hintBtn').disabled = n <= 0; }
+function updHint(){ const n = hintsLeft(); $('hintBtn').textContent = 'Dica ' + n; $('hintBtn').disabled = n <= 0; $('hintBtn').setAttribute('aria-label', 'Usar uma dica (' + n + ' nesta missão)'); }
 
 // ---------- código ----------
 function buildCode(){
@@ -621,7 +639,7 @@ function renderTags(upto){
 function buildBoard(){
   const m = G.m, b = $('board'); b.innerHTML = '';
   G.map = E.parseMap(m.map); G.cells = {};
-  const hide = !!m.soVar;
+  const hide = G.semMapa;
   b.style.display = hide ? 'none' : '';
   if (hide) return;
   m.map.forEach((row, y) => [...row].forEach((ch, x) => {
@@ -636,7 +654,7 @@ function buildBoard(){
   const r = document.createElement('div'); r.className = 'robot'; r.innerHTML = ROBOT_SVG; b.appendChild(r); G.robot = r;
 }
 function sizeBoard(cs){
-  const m = G.m; if (m.soVar) return;
+  const m = G.m; if (G.semMapa) return;
   G.cs = cs; const b = $('board');
   b.style.width = cs * G.map.w + 'px'; b.style.height = cs * G.map.h + 'px';
   Object.values(G.cells).forEach(c => { c.style.left = c.dataset.x * cs + 'px'; c.style.top = c.dataset.y * cs + 'px'; c.style.width = cs + 'px'; c.style.height = cs + 'px'; c.querySelector('.dot').style.fontSize = Math.round(cs * .42) + 'px'; });
@@ -659,7 +677,7 @@ function showPhantom(x, y){ const p = G.ph; if (!p) return; p.style.left = (x + 
 function renderState(j, anim){
   const m = G.m, s = j >= 0 ? G.steps[j] : null;
   const x = s ? s.x : m.start[0], y = s ? s.y : m.start[1];
-  if (!m.soVar) {
+  if (!G.semMapa) {
     const jump = !anim || !G.pos || Math.abs(G.pos[0] - x) + Math.abs(G.pos[1] - y) > 1;
     placeRobot(x, y, jump);
     const lit = s ? s.lit : {};
@@ -727,7 +745,7 @@ function fit(){
     const codeH = $('code').offsetHeight + 26;
     let cs;
     const others = $('banner').offsetHeight + $('pv').offsetHeight + $('sideS').offsetHeight + 24;
-    if (m.soVar) cs = 40;
+    if (G.semMapa) cs = 40;
     else if (wide) {
       const colW = st.clientWidth - $('codeP').offsetWidth - (G.mesa ? 282 : 0) - 64 - pad;
       cs = Math.min(colW / G.map.w, (avail - others - pad) / G.map.h, 84);
@@ -812,7 +830,9 @@ function endSweep(alvo){
 function pulseKey(k){ document.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('hint', b.dataset.k === k)); }
 function input(k){
   if (G.mode !== 'rastrear' || G.busy || G.done) return;
-  if (G.sweeping || (G.steps[G.idx] && G.steps[G.idx].kind !== 'in')) { stopAll(); endSweep(nextIn(G.idx)); if (G.done) return; }
+  // a primeira tecla durante o foco só pula a animação: não conta como resposta
+  if (G.sweeping) { stopAll(); endSweep(nextIn(G.idx)); return; }
+  if (G.steps[G.idx] && G.steps[G.idx].kind !== 'in') { stopAll(); endSweep(nextIn(G.idx)); if (G.done) return; }
   const s = G.steps[G.idx]; if (!s) return;
   if (k === s.key) {
     pulseKey(null);
@@ -852,30 +872,50 @@ function finishRastrear(){
 
 // ----- prever -----
 function cellTap(x, y){
-  if (G.mode !== 'prever' || G.busy || G.done) return;
+  if (G.mode !== 'prever' || G.busy || G.done || G.aguardaNova) return;
+  if (G.revelado) {
+    const f = G.tr.final;
+    if (x === f.x && y === f.y) { G.cells[x + ',' + y].classList.add('pick'); G.done = true; later(() => endMission(1), 400); }
+    else toast('Toque na calçada marcada em verde.');
+    return;
+  }
   Object.values(G.cells).forEach(c => c.classList.remove('pick', 'wrong'));
   G.pick = [x, y]; G.cells[x + ',' + y].classList.add('pick');
   $('actBtn').disabled = false;
 }
 function conferir(){
-  if (G.busy) return;
-  const m = G.m; G.tries++;
+  if (G.busy || G.done) return;
+  if (G.aguardaNova) { resetPrever(); return; }
+  const m = G.m;
+  if (G.revelado) {
+    if (m.soVar && G.pvVal === G.tr.final.vars[m.predictVar]) { G.done = true; endMission(1); }
+    else banner('Ajuste o valor para ' + E.fmtValor(G.tr.final.vars[m.predictVar]) + ' e confira para concluir.');
+    return;
+  }
+  G.tries++;
   G.hideVars = false; G.showTrail = true;
   Object.values(G.cells).forEach(c => c.classList.remove('wrong'));
   const fim = G.tr.final;
   const certo = m.soVar ? fim.vars[m.predictVar] === G.pvVal : (G.pick && fim.x === G.pick[0] && fim.y === G.pick[1]);
   banner('Veja o computador executar.');
   play(G.steps.length - 1, 120, () => {
-    if (certo) { SND.win(); later(() => endMission(G.tries === 1 ? 3 : G.tries === 2 ? 2 : 1), 500); }
-    else {
-      SND.err();
-      if (m.soVar) banner('O valor final é ' + E.fmtValor(fim.vars[m.predictVar]) + ', não ' + G.pvVal + '. Veja o teste de mesa e tente prever de novo.');
-      else { banner('Não era aí. O caminho percorrido ficou marcado. Tente de novo.'); if (G.pick) G.cells[G.pick + ''].classList.add('wrong'); }
-      G.tries < 3 ? later(resetPrever, 2600) : later(() => endMission(1), 2600);
+    if (certo) { G.done = true; later(() => endMission(G.tries === 1 ? 3 : G.tries === 2 ? 2 : 1), 500); return; }
+    SND.err();
+    const onde = G.mesa ? 'o teste de mesa' : 'o quadro de variáveis';
+    if (!m.soVar && G.pick) G.cells[G.pick + ''].classList.add('wrong');
+    if (G.tries < 3) {
+      if (m.soVar) banner('O valor final é ' + E.fmtValor(fim.vars[m.predictVar]) + ', não ' + G.pvVal + '. Veja ' + onde + ' e, quando quiser, tente de novo.');
+      else banner('Não era aí. O caminho percorrido ficou marcado. Estude o caminho e, quando quiser, tente de novo.');
+      G.aguardaNova = true; $('actBtn').textContent = 'Tentar de novo'; $('actBtn').disabled = false;
+    } else {
+      // depois do 3º erro o jogo mostra a resposta; o estudante confirma para concluir com 1 estrela
+      G.revelado = true;
+      if (m.soVar) { banner('O valor final é ' + E.fmtValor(fim.vars[m.predictVar]) + '. Veja ' + onde + ', ajuste o valor e confira para concluir.'); $('actBtn').disabled = false; }
+      else { G.cells[fim.x + ',' + fim.y].classList.add('answer'); banner('A resposta está marcada em verde. Compare com o caminho e toque nela para concluir.'); $('actBtn').disabled = true; }
     }
   });
 }
-function resetPrever(){ G.hideVars = true; G.showTrail = false; G.pick = null; Object.values(G.cells).forEach(c => c.classList.remove('pick', 'wrong')); renderState(-1); clearMarks(['on', 'sw', 'err']); $('actBtn').disabled = !G.m.soVar; banner(G.baseBanner); }
+function resetPrever(){ G.aguardaNova = false; G.hideVars = true; G.showTrail = false; G.pick = null; Object.values(G.cells).forEach(c => c.classList.remove('pick', 'wrong', 'answer')); renderState(-1); clearMarks(['on', 'sw', 'err']); $('actBtn').textContent = 'Conferir'; $('actBtn').disabled = !G.m.soVar; banner(G.baseBanner); }
 
 // reproduz o rastro até o passo 'ate' (usado por prever, depurar, explicar)
 function play(ate, ms, done){
@@ -946,7 +986,7 @@ function executar(){
   const ate = t.overflow ? Math.min(G.steps.length - 1, 80) : G.steps.length - 1;
   banner('Executando...');
   play(ate, 70, () => {
-    if (ok) { SND.win(); G.done = true; later(() => endMission(G.runs === 1 ? 3 : G.runs === 2 ? 2 : 1), 500); return; }
+    if (ok) { G.done = true; later(() => endMission(G.runs === 1 ? 3 : G.runs === 2 ? 2 : 1), 500); return; }
     SND.err();
     const ult = G.steps[ate];
     if (ult) mark(ult.nid, 'err');
@@ -962,13 +1002,13 @@ function executar(){
 function escolher(b){
   if (G.done || b.classList.contains('no')) return;
   G.tries++;
-  if (b.dataset.ok === '1') { b.classList.add('yes'); SND.win(); G.done = true; later(() => endMission(G.tries === 1 ? 3 : G.tries === 2 ? 2 : 1), 700); }
+  if (b.dataset.ok === '1') { b.classList.add('yes'); G.done = true; later(() => endMission(G.tries === 1 ? 3 : G.tries === 2 ? 2 : 1), 700); }
   else { b.classList.add('no'); SND.err(); banner('Não é isso. Veja executar e compare com as frases.'); }
 }
 
 // ----- dicas -----
 function useHint(){
-  const mid = G.m.marco; if (hintsLeft(mid) <= 0 || G.done) return;
+  if (hintsLeft() <= 0 || G.done || G.busy) return;
   const mode = G.mode;
   if (mode === 'rastrear') {
     if (G.sweeping) { stopAll(); endSweep(nextIn(G.idx)); }
@@ -984,14 +1024,17 @@ function useHint(){
     const ln = el && el.closest('.line'); if (ln) ln.classList.add('sus');
     banner('O erro está na linha marcada em laranja.');
   } else if (mode === 'prever') {
-    G.hideVars = false; renderVars(-1);
-    banner('Dica: siga o código com o dedo, linha por linha, e anote cada mudança. Um laço repete o bloco inteiro.');
+    if (G.aguardaNova || G.revelado) return;
+    // dica: o computador executa a primeira metade do programa e o estudante continua dali
+    const meio = Math.max(0, Math.floor(G.steps.length / 2) - 1), s = G.steps[meio];
+    G.hideVars = false; G.showTrail = true; renderState(meio); G.curState = meio; mark(s.nid, 'on');
+    banner('Dica: o computador executou até a linha ' + (lineIdx(s.nid) + 1) + ', a metade do caminho. Continue a leitura daí.');
   } else {
     const errada = [...$('opts').querySelectorAll('.opt')].find(b => b.dataset.ok === '0' && !b.classList.contains('no'));
     if (errada) errada.classList.add('no');
     banner('Uma das frases erradas foi riscada.');
   }
-  G.hintsUsed++; P.hints[mid] = (P.hints[mid] || 0) + 1; save(); updHint();
+  G.hintsUsed++; updHint();
 }
 
 // ---------- fim e reprodução ----------
@@ -1008,7 +1051,7 @@ function endMission(stars){
   if (stars < 3) p += ' Jogue de novo para tentar 3 estrelas: o mapa vem espelhado.';
   $('endP').textContent = p;
   $('endL').textContent = 'Você praticou: ' + k.aprendeu + '.';
-  const nx = proxima();
+  const nx = proximaDepois(m);
   $('endNext').style.display = nx ? '' : 'none';
   ov('endOv', true);
   later(() => $('endNext').focus(), 50);
@@ -1041,7 +1084,7 @@ $('playBtn').onclick = () => { show('mapa'); renderMap(); };
 $('homeBtn').onclick = () => show('home');
 $('contBtn').onclick = () => { const nx = proxima(); if (nx) openMission(nx.id); };
 $('backBtn').onclick = goMap;
-$('concBtn').onclick = openConceito;
+$('concBtn').onclick = () => openConceito();
 $('hintBtn').onclick = useHint;
 $('sndBtn').onclick = () => { P.mute = !P.mute; save(); $('sndTxt').textContent = P.mute ? 'Som: não' : 'Som'; $('sndBtn').classList.toggle('mut', P.mute); };
 $('sweepBtn').onclick = () => { P.sweep = !P.sweep; save(); $('sweepBtn').classList.toggle('on', P.sweep); toast(P.sweep ? 'Foco passo a passo ligado.' : 'Foco direto: pula para a próxima ação.'); };
@@ -1055,9 +1098,9 @@ $('popDown').onclick = () => bump(-1);
 document.addEventListener('click', e => { if (popEl && !$('pop').contains(e.target) && e.target !== popEl) closePop(); });
 $('endMap').onclick = goMap;
 $('endAgain').onclick = () => { ov('endOv', false); openMission(G.m.id); };
-$('endNext').onclick = () => { ov('endOv', false); const nx = proxima(); if (nx) openMission(nx.id); };
+$('endNext').onclick = () => { ov('endOv', false); const nx = proximaDepois(G.m); if (nx) openMission(nx.id); };
 $('endReplay').onclick = replay;
-$('tpFirst').onclick = () => { stopAll(); rpGo(-1); };
+$('tpFirst').onclick = () => { stopAll(); $('tpPlay').textContent = '▶'; rpGo(-1); };
 $('tpPrev').onclick = () => { stopAll(); $('tpPlay').textContent = '▶'; rpGo(G.rp - 1); };
 $('tpNext').onclick = () => { stopAll(); $('tpPlay').textContent = '▶'; rpGo(G.rp + 1); };
 $('tpPlay').onclick = rpPlay;
@@ -1066,7 +1109,14 @@ $('code').addEventListener('click', () => { if (G.sweeping) { stopAll(); endSwee
 
 const KEYS = { ArrowUp: 'U', ArrowDown: 'D', ArrowLeft: 'L', ArrowRight: 'R', Enter: 'E', ' ': 'E' };
 document.addEventListener('keydown', e => {
-  if (!$('jogo').classList.contains('on') || document.querySelector('.ov.on')) return;
+  const aberto = document.querySelector('.ov.on');
+  if (aberto && e.key === 'Escape') {
+    if (aberto.id === 'concOv') $('ccClose').click();
+    else if (aberto.id === 'endOv') goMap();
+    else ov(aberto.id, false);
+    e.preventDefault(); return;
+  }
+  if (!$('jogo').classList.contains('on') || aberto) return;
   if (e.target.closest && e.target.closest('.ed,.opt,.btn,.ico') && (e.key === 'Enter' || e.key === ' ')) return;
   if (G.mode === 'replay') { if (e.key === 'ArrowRight') rpGo(G.rp + 1); else if (e.key === 'ArrowLeft') rpGo(G.rp - 1); else if (e.key === ' ') rpPlay(); else return; e.preventDefault(); return; }
   if (popEl) { if (e.key === 'ArrowUp') bump(1); else if (e.key === 'ArrowDown') bump(-1); else if (e.key === 'Escape') closePop(); else return; e.preventDefault(); return; }
