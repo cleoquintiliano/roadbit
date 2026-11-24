@@ -31,6 +31,11 @@ MISSIONS.forEach(m0 => [m0, E.mirrorMission(m0)].forEach((m, esp) => {
     if (m.modo === 'prever' && !m.predictVar && t.final.x === m.start[0] && t.final.y === m.start[1]) falha(m, 'termina onde começou' + tag);
     if (m.modo === 'explicar' && (!m.opcoes || m.opcoes.length !== 3)) falha(m, 'precisa de 3 opções');
   }
+  // textos com direção precisam combinar com o código, inclusive na missão espelhada
+  const codigo = L.lines.map(l => l.html).join(' ');
+  const dirs = { direita: /direita\(\)|livre\(<\/span>→|"→"|→/, esquerda: /esquerda\(\)|livre\(<\/span>←|"←"|←/ };
+  const textos = [m.modo === 'explicar' ? m.opcoes[0] : '', m.guia || ''].join(' ');
+  Object.keys(dirs).forEach(w => { if (new RegExp(w).test(textos) && !dirs[w].test(codigo)) falha(m, 'texto cita "' + w + '" mas o código não' + tag); });
   if (m.modo === 'depurar') {
     if (!t.fail && t.allLit && !t.overflow) falha(m, 'o código com erro já funciona' + tag);
     const c = roda(m, m.certo).t;

@@ -355,11 +355,19 @@ function mirrorMission(m) {
     blocosDe(st).forEach(bl);
   });
   bl(c.code); if (c.certo) bl(c.certo);
+  // os textos que citam direção também espelham, senão a frase certa passa a descrever o caminho ao contrário
+  if (c.titulo) c.titulo = espelharTexto(c.titulo);
+  if (c.guia) c.guia = espelharTexto(c.guia);
+  if (c.alvo) c.alvo = espelharTexto(c.alvo);
+  if (c.opcoes) c.opcoes = c.opcoes.map(espelharTexto);
   return c;
+}
+function espelharTexto(t) {
+  return t.replace(/direita|esquerda|→|←/g, w => ({ direita: 'esquerda', esquerda: 'direita', '→': '←', '←': '→' }[w]));
 }
 
 const RoadBitMotor = { DIRS, MOVE_WORD, MOVE_NOME, SETA, DIR_DA_SETA, SYM, x, N, T, BO, V, B, NAO, S, PL, LIVRE, LS, IX, TAM, REC, FLD, FC,
   mv, R_, L_, U_, D_, ENT, mvx, rep, cada, se, enq, set, setx, esc, ler, def, call, ret,
-  clone, parseMap, ehPlaca, coletar, layout, simulate, mirrorMission, fmtValor };
+  clone, parseMap, ehPlaca, coletar, layout, simulate, mirrorMission, espelharTexto, fmtValor };
 if (typeof module !== 'undefined') module.exports = RoadBitMotor;
 else if (typeof window !== 'undefined') window.RoadBitMotor = RoadBitMotor;
